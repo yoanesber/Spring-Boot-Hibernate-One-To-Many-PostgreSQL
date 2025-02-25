@@ -25,7 +25,7 @@
     <p data-start="2510" data-end="2544"><strong data-start="2510" data-end="2542">Example </strong><code data-start="2520" data-end="2526"><strong data-start="2510" data-end="2542">.env.development</strong></code><strong data-start="2510" data-end="2542"> file content:</strong></p>
     <div style="background-color:#23272e;color:#abb2bf;font-family:Consolas, 'Courier New', monospace;font-size:14px;font-weight:normal;line-height:19px;white-space:pre;">
         <div><span style="color:#7f848e;"># application</span></div>
-        <div><span style="color:#e06c75;">APP_PORT</span><span style="color:#56b6c2;">=</span><span style="color:#98c379;">4000</span></div>
+        <div><span style="color:#e06c75;">APP_PORT</span><span style="color:#56b6c2;">=</span><span style="color:#98c379;">8081</span></div>
         <div><span style="color:#e06c75;">SPRING_PROFILES_ACTIVE</span><span style="color:#56b6c2;">=</span><span style="color:#98c379;">development</span></div>
         <div>&nbsp;</div>
     </div>
