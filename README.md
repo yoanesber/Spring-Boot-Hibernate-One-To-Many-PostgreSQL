@@ -2,8 +2,8 @@
 Implement JPA/Hibernate One-To-Many mapping with Hibernate in a Spring Boot CRUD example using `@OneToMany` annotation
 
 ## 🚀 Overview
-This project is a REST API built using **Spring Boot v3.4.2** to handle CRUD operations for Employee and Department entities. The project integrates **Spring Data JPA** with **Hibernate** as the default JPA provider and uses **PostgreSQL** as the database. It also includes a custom HTTP response and a custom error controller to override the default `/error` response.
-This project implements `One-To-Many` relationships between Employee as the parent entity and the child entities DepartmentEmployee, SalaryEmployee, and TitleEmployee. The relationship is managed using Spring Data JPA with Hibernate, and the project utilizes `EmbeddedId` for **composite primary keys** in the relationship tables.
+This project is a REST API built using `Spring Boot v3.4.2` to handle CRUD operations for `Employee` and `Department` entities. The project integrates `Spring Data JPA` with `Hibernate` as the default JPA provider and uses `PostgreSQL` as the database. It also includes a custom HTTP response and a **custom error controller** to override the default `/error` response.
+This project implements `One-To-Many` relationships between `Employee` as the parent entity and the child entities` DepartmentEmployee, SalaryEmployee, and TitleEmployee`. The relationship is managed using Spring Data JPA with Hibernate, and the project utilizes `EmbeddedId` for 1composite primary keys` in the relationship tables.
 
 ---
 
@@ -28,7 +28,7 @@ The project follows a layered architecture with the following structure:
 ---
 
 ## 📂 Environment Configuration
-The application uses .env files for different environments (development, testing, production), which are referenced in the respective application.properties file.
+The application uses `.env` files for different environments (development, testing, production), which are referenced in the respective `application.properties` file.
 
 Example `.env.development` file content:
 ```properties
@@ -197,7 +197,7 @@ These tables are managed using EmbeddedId to define composite primary keys:
 
 ## 📜 Custom Handler
 ### Custom HTTP Response
-This project includes a CustomHttpResponse entity to standardize API responses, ensuring consistency across all endpoints.
+This project includes a `CustomHttpResponse` entity to standardize API responses, ensuring consistency across all endpoints.
 ```java
 public class CustomHttpResponse {
     private Integer statusCode;
@@ -214,7 +214,7 @@ public class CustomHttpResponse {
 ```
 
 ### Custom Error Handling
-The default "/error" response is overridden using a CustomErrorController, which provides a structured error response format.
+The default `/error` response is overridden using a `CustomErrorController`, which provides a structured error response format.
 
 ```java
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.CustomHttpResponse;
@@ -269,7 +269,7 @@ A step by step series of examples that tell you how to get a development env run
 ---
 
 ## 🔗 API Endpoints
-I built a Spring Boot JPA Rest CRUD API for an Employee and Department services.
+I built a Spring Boot JPA Rest CRUD API for `Employee` and `Department` services.
 
 These are APIs that we need to provide:
 ### Department API Endpoints
