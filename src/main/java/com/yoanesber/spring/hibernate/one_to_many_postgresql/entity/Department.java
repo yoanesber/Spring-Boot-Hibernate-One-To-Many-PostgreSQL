@@ -9,10 +9,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
-@Entity(name = "department")    // name of the table in the database
+@Getter
+@Setter
+@NoArgsConstructor  // Mandatory for JPA (Hibernate needs a no-arg constructor to create objects).
+@AllArgsConstructor // Useful for creating objects manually
+@Entity
+@Table(name = "department")    // name of the table in the database
 public class Department {
     @Id
     @Column(name = "id", nullable = false, length = 4)
