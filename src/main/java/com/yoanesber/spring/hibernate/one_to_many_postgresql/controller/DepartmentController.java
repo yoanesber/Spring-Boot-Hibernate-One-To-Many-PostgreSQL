@@ -20,7 +20,7 @@ import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.DepartmentS
 @RequestMapping("/api/v1/departments")
 public class DepartmentController {
 
-    private DepartmentService departmentService;
+    private final DepartmentService departmentService;
 
     public DepartmentController(DepartmentService departmentService) {
         this.departmentService = departmentService;

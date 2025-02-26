@@ -21,7 +21,7 @@ import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.EmployeeSer
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
     
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
 
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;

@@ -1,7 +1,6 @@
 package com.yoanesber.spring.hibernate.one_to_many_postgresql.service.impl;
 
 import java.sql.Timestamp;
-import java.util.stream.Collectors;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -115,7 +114,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeDTO> getAllEmployees() {
         try {
-            return employeeRepository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(EmployeeDTO::new).collect(Collectors.toList());
+            List<Employee> employees = employeeRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+            return employees.stream().map(EmployeeDTO::new).toList();
         } catch (Exception e) {
             throw new RuntimeException("Error getting all employees: " + e.getMessage());
         }

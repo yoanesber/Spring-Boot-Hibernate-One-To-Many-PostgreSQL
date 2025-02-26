@@ -1,7 +1,6 @@
 package com.yoanesber.spring.hibernate.one_to_many_postgresql.service.impl;
 
 import java.sql.Timestamp;
-import java.util.stream.Collectors;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -54,7 +53,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public List<DepartmentDTO> getAllDepartments() {
         try {
-            return departmentRepository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(DepartmentDTO::new).collect(Collectors.toList());
+            List<Department> departments = departmentRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+            return departments.stream().map(DepartmentDTO::new).toList();
         } catch (Exception e) {
             throw new RuntimeException("Error getting all departments: " + e.getMessage());
         }
