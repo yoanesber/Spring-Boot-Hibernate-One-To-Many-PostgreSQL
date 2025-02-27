@@ -20,12 +20,17 @@ public class CustomErrorController implements ErrorController {
 
     @RequestMapping
     public ResponseEntity<CustomHttpResponse> handleError(HttpServletRequest request) {
+        // Create a custom error response
         CustomHttpResponse errorDetails = new CustomHttpResponse();
+
+        // Set the error details
         errorDetails.setTimestamp(LocalDateTime.now());
 
+        // Get the error status code and message
         Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         String message = (String) request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
 
+        // Set the default status code and message
         if (statusCode == null) {
             statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
         } 
@@ -42,10 +47,12 @@ public class CustomErrorController implements ErrorController {
             message = (message != null) ? message : "Unexpected error occurred";
         }
 
+        // Set the error details
         errorDetails.setStatusCode(statusCode);
         errorDetails.setMessage(message);
         errorDetails.setData(null);
 
+        // Return the response
         return new ResponseEntity<>(errorDetails, HttpStatus.valueOf(statusCode));
     }
 }

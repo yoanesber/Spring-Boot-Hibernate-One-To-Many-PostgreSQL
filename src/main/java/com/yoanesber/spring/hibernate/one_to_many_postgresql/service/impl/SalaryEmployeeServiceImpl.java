@@ -10,7 +10,8 @@ import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.SalaryEmplo
 
 @Service
 public class SalaryEmployeeServiceImpl implements SalaryEmployeeService {
-    private SalaryEmployeeRepository salaryEmployeeRepository;
+
+    private final SalaryEmployeeRepository salaryEmployeeRepository;
 
     public SalaryEmployeeServiceImpl(SalaryEmployeeRepository salaryEmployeeRepository) {
         this.salaryEmployeeRepository = salaryEmployeeRepository;

@@ -12,7 +12,7 @@ import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.TitleEmploy
 @Service
 public class TitleEmployeeServiceImpl implements TitleEmployeeService {
     
-    private TitleEmployeeRepository titleEmployeeRepository;
+    private final TitleEmployeeRepository titleEmployeeRepository;
 
     public TitleEmployeeServiceImpl(TitleEmployeeRepository titleEmployeeRepository) {
         this.titleEmployeeRepository = titleEmployeeRepository;

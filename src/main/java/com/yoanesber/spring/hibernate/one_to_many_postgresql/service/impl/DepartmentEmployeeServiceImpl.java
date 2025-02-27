@@ -11,7 +11,7 @@ import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.DepartmentE
 @Service
 public class DepartmentEmployeeServiceImpl implements DepartmentEmployeeService {
 
-    private DepartmentEmployeeRepository departmentEmployeeRepository;
+    private final DepartmentEmployeeRepository departmentEmployeeRepository;
 
     public DepartmentEmployeeServiceImpl(DepartmentEmployeeRepository departmentEmployeeRepository) {
         this.departmentEmployeeRepository = departmentEmployeeRepository;

@@ -24,15 +24,15 @@ import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.TitleEmploy
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
-    private DepartmentService departmentService;
+    private final DepartmentService departmentService;
 
-    private DepartmentEmployeeService departmentEmployeeService;
+    private final DepartmentEmployeeService departmentEmployeeService;
 
-    private SalaryEmployeeService salaryEmployeeService;
+    private final SalaryEmployeeService salaryEmployeeService;
 
-    private TitleEmployeeService titleEmployeeService;
+    private final TitleEmployeeService titleEmployeeService;
 
     public EmployeeServiceImpl(EmployeeRepository employeeRepository,
         DepartmentService departmentService, DepartmentEmployeeService departmentEmployeeService,
@@ -114,7 +114,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeDTO> getAllEmployees() {
         try {
+            // Get all employees
             List<Employee> employees = employeeRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+
+            // Check if the list is empty
+            if (employees.isEmpty()) {
+                return null;
+            }
+
+            // Return the list of employees
             return employees.stream().map(EmployeeDTO::new).toList();
         } catch (Exception e) {
             throw new RuntimeException("Error getting all employees: " + e.getMessage());
@@ -126,7 +134,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         Assert.notNull(id, "Employee id cannot be null");
 
         try {
-            return employeeRepository.findById(id).map(EmployeeDTO::new).orElse(null);
+            // Get the employee by id
+            Employee employee = employeeRepository.findById(id)
+                .orElse(null);
+
+            // Check if the employee exists
+            if (employee == null) {
+                return null;
+            }
+
+            // Return the employee
+            return new EmployeeDTO(employee);
         } catch (Exception e) {
             throw new RuntimeException("Error getting employee by id: " + e.getMessage());
         }
@@ -140,12 +158,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         try {
             // Get the existing employee
-            Employee existingEmployee = employeeRepository.findById(id).orElse(null);
+            Employee existingEmployee = employeeRepository.findById(id)
+                .orElse(null);
             
             // Check if the employee exists
             if (existingEmployee == null) {
-                throw new IllegalArgumentException("Employee with id " + id + " does not exist");
+                return null;
             } else {
+                // Update the employee
                 existingEmployee.setBirthDate(employeeDTO.getBirthDate());
                 existingEmployee.setFirstName(employeeDTO.getFirstName());
                 existingEmployee.setLastName(employeeDTO.getLastName());
@@ -210,11 +230,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     
     @Override
     @Transactional
-    public void deleteEmployee(Long id) {
+    public Boolean deleteEmployee(Long id) {
         Assert.notNull(id, "Employee id cannot be null");
 
         try {
+            // Delete the employee
+            Employee employee = employeeRepository.findById(id)
+                .orElse(null);
+
+            // Check if the employee exists
+            if (employee == null) {
+                return false;
+            }
+
+            // Delete the employee
             employeeRepository.deleteById(id);
+            return true;
         } catch (Exception e) {
             throw new RuntimeException("Error deleting employee: " + e.getMessage());
         }

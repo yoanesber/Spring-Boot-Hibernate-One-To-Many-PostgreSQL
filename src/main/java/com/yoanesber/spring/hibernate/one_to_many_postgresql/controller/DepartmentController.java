@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.dto.DepartmentDTO;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.CustomHttpResponse;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.Department;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.DepartmentService;
 
 @RestController
@@ -29,13 +30,16 @@ public class DepartmentController {
     @PostMapping
     public ResponseEntity<Object> saveDepartment(@RequestBody DepartmentDTO departmentDTO) {
         try {
+            // Check if the input is null
             if (departmentDTO == null) {
                 return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
                     "Department cannot be null", null));
             } 
             
+            // Save department
             departmentService.saveDepartment(departmentDTO);
 
+            // Return the response
             return ResponseEntity.created(null).body(new CustomHttpResponse(HttpStatus.CREATED.value(), 
                 "Department saved successfully", null));
         } catch (Exception e) {
@@ -47,15 +51,49 @@ public class DepartmentController {
     @GetMapping
     public ResponseEntity<Object> getAllDepartments() {
         try {
+            // Get all departments
             List<DepartmentDTO> departments = departmentService.getAllDepartments();
 
-            if (departments.isEmpty()) {
+            // Check if the list is empty
+            if (departments == null || departments.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
                     "No departments found", null));
             }
             
+            // Return the response
             return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
                 "All departments fetched successfully", departments));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+                e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getDepartmentById(@PathVariable String id) {
+        try {
+            // Check if the input is null
+            if (id == null || id.isEmpty()) {
+                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
+                    "Department id cannot be null or empty", null));
+            }
+
+            // Get department by id
+            id = id.toLowerCase();
+            Department department = departmentService.getDepartmentById(id);
+
+            // Create department DTO
+            DepartmentDTO departmentDto = new DepartmentDTO(department);
+
+            // Check if department is null
+            if (department == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
+                    "Department not found", null));
+            }
+
+            // Return the response
+            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
+                "Department fetched successfully", departmentDto));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
                 e.getMessage(), null));
@@ -65,6 +103,7 @@ public class DepartmentController {
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateDepartment(@PathVariable String id, @RequestBody DepartmentDTO departmentDTO) {
         try {
+            // Check if the input is null
             if (id == null || id.isEmpty()) {
                 return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
                     "Department id cannot be null or empty", null));
@@ -75,9 +114,17 @@ public class DepartmentController {
                     "Department cannot be null", null));
             }
             
+            // Update department
             id = id.toLowerCase();
             DepartmentDTO updatedDepartment = departmentService.updateDepartment(id, departmentDTO);
 
+            // Check if department is null
+            if (updatedDepartment == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
+                    "Department not found", null));
+            }
+
+            // Return the response
             return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
                 "Department updated successfully", updatedDepartment));
         } catch (Exception e) {
@@ -89,14 +136,20 @@ public class DepartmentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteDepartment(@PathVariable String id) {
         try {
+            // Check if the input is null
             if (id == null || id.isEmpty()) {
                 return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
                     "Department id cannot be null or empty", null));
             }
 
+            // Delete department
             id = id.toLowerCase();
-            departmentService.deleteDepartment(id);
+            if (!departmentService.deleteDepartment(id)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
+                    "Department not found", null));
+            }
 
+            // Return the response
             return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
                 "Department deleted successfully", null));
         } catch (Exception e) {

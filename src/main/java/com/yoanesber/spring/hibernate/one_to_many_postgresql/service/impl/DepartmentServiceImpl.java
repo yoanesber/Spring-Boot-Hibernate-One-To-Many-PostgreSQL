@@ -16,7 +16,7 @@ import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.DepartmentS
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
     
-    private DepartmentRepository departmentRepository;
+    private final DepartmentRepository departmentRepository;
 
     public DepartmentServiceImpl(DepartmentRepository departmentRepository) {
         this.departmentRepository = departmentRepository;
@@ -28,8 +28,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         Assert.notNull(departmentDTO, "Department cannot be null");
 
         try {
-            Department existingDepartment = departmentRepository.findById(departmentDTO.getId()).orElse(null);
+            // Check if department exists
+            Department existingDepartment = departmentRepository.findById(departmentDTO.getId())
+                .orElse(null);
 
+            // Check if department exists
             if (existingDepartment != null) {
                 throw new IllegalArgumentException("Department with id " + departmentDTO.getId() + " already exists");
             } else {
@@ -43,6 +46,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 department.setUpdatedBy((Long)departmentDTO.getUpdatedBy());
                 department.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
 
+                // Save department
                 departmentRepository.save(department);
             }
         } catch (Exception e) {
@@ -53,7 +57,15 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public List<DepartmentDTO> getAllDepartments() {
         try {
+            // Get all departments
             List<Department> departments = departmentRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+
+            // Check if departments is empty
+            if (departments.isEmpty()) {
+                return null;
+            }
+
+            // Return departments
             return departments.stream().map(DepartmentDTO::new).toList();
         } catch (Exception e) {
             throw new RuntimeException("Error getting all departments: " + e.getMessage());
@@ -65,7 +77,17 @@ public class DepartmentServiceImpl implements DepartmentService {
         Assert.hasText(id, "Department id cannot be null or empty");
 
         try {
-            return departmentRepository.findById(id).orElse(null);
+            // Get department by id
+            Department department = departmentRepository.findById(id)
+                .orElse(null);
+
+            // Check if department is null
+            if (department == null) {
+                return null;
+            }
+
+            // Return department
+            return department;
         } catch (Exception e) {
             throw new RuntimeException("Error getting department by id: " + e.getMessage());
         }
@@ -79,17 +101,20 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         try {
             // Get existing department
-            Department existingDepartment = departmentRepository.findById(id).orElse(null);
+            Department existingDepartment = departmentRepository.findById(id)
+                .orElse(null);
 
             // Check if department exists
             if (existingDepartment == null) {
-                throw new IllegalArgumentException("Department with id " + id + " does not exist");
+                return null;
             } else {
+                // Update department
                 existingDepartment.setDeptName(departmentDTO.getDeptName());
                 existingDepartment.setActive(null != departmentDTO.getActive() ? departmentDTO.getActive() : existingDepartment.getActive());
                 existingDepartment.setUpdatedBy((Long)departmentDTO.getUpdatedBy());
                 existingDepartment.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
 
+                // Save department
                 return new DepartmentDTO(departmentRepository.save(existingDepartment));
             }
         } catch (Exception e) {
@@ -99,11 +124,22 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public void deleteDepartment(String id) {
+    public Boolean deleteDepartment(String id) {
         Assert.hasText(id, "Department id cannot be null or empty");
 
         try {
+            // Get existing department
+            Department existingDepartment = departmentRepository.findById(id)
+                .orElse(null);
+
+            // Check if department exists
+            if (existingDepartment == null) {
+                return false;
+            }
+
+            // Delete department
             departmentRepository.deleteById(id);
+            return true;
         } catch (Exception e) {
             throw new RuntimeException("Error deleting department: " + e.getMessage());
         }

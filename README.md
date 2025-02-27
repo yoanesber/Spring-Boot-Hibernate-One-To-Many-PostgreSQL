@@ -7,15 +7,13 @@ This project implements `One-To-Many` relationships between `Employee` as the pa
 
 ---
 
-
 ## ✨Tech Stack
 The technology used in this project are:
-- Java v21 ☕
-- Spring Boot v3.4.2 
-- Spring Data JPA with Hibernate (simplifying database interactions)
-- Spring Boot Starter Web (building RESTful APIs or web applications)
-- PostgreSQL Database
-- Lombok (Reducing boilerplate code)
+- `Spring Boot 3.4.2` : Framework for building RESTful APIs
+- `Spring Data JPA with Hibernate` : Simplifying database interactions
+- `Spring Boot Starter Web` : Building RESTful APIs or web applications
+- `PostgreSQL` : Database for persisting Netflix Shows
+- `Lombok` : Reducing boilerplate code
 ---
 
 ## 📋 Project Structure
@@ -28,7 +26,7 @@ The project follows a layered architecture with the following structure:
 ---
 
 ## 📂 Environment Configuration
-The application uses `.env` files for different environments (development, testing, production), which are referenced in the respective `application.properties` file.
+Configuration values are stored in `.env.development` and referenced in `application.properties`.
 
 Example `.env.development` file content:
 ```properties
@@ -54,21 +52,14 @@ spring.datasource.url=jdbc:postgresql://localhost:${SPRING_DATASOURCE_PORT}/${SP
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 
-## hibernate
-spring.jpa.show-sql=true
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.hibernate.naming.implicit-strategy=org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
-spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.open-in-view=true
-
 ## server error handling
 server.error.whitelabel.enabled=false
 server.error.include-message=always
 ```
 ---
 
-## 💾 Database Schema & Relationship
-The database schema consists of the following tables:
+## 💾 Database Schema & Relationships
+The project uses PostgreSQL as its database, with a structured schema to store the data efficiently. Below is the DDL (Data Definition Language) used to create the database schema.
 
 ### Create Schema Employees
 Database schema.
@@ -79,23 +70,6 @@ CREATE SCHEMA employees;
 ### Employee Table (employees.employee)
 Stores employee details.
 ```sql
-CREATE TABLE employees.employee (
-id bigint NOT NULL,
-birth_date date NOT NULL,
-first_name character varying(20) NOT NULL,
-last_name character varying(20),
-gender character varying(1) NOT NULL,
-hire_date date NOT NULL,
-active boolean DEFAULT false NOT NULL,
-created_by bigint NOT NULL,
-created_date timestamp with time zone DEFAULT now() NOT NULL,
-updated_by bigint NOT NULL,
-updated_date timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE ONLY employees.employee
-ADD CONSTRAINT idx_16988_primary PRIMARY KEY (id);
-
 CREATE SEQUENCE employees.id_employee_seq
 START WITH 1
 INCREMENT BY 1
@@ -103,82 +77,85 @@ NO MINVALUE
 NO MAXVALUE
 CACHE 1;
 
-ALTER SEQUENCE employees.id_employee_seq OWNED BY employees.employee.id;
+CREATE TABLE employees.employee (
+    id bigint NOT NULL DEFAULT nextval('employees.id_employee_seq'::regclass),
+    birth_date date NOT NULL,
+    first_name character varying(20) NOT NULL,
+    last_name character varying(20),
+    gender character varying(1) NOT NULL,
+    hire_date date NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    created_by bigint NOT NULL,
+    created_date timestamp with time zone DEFAULT now() NOT NULL,
+    updated_by bigint NOT NULL,
+    updated_date timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT employee_pkey PRIMARY KEY (id),
+);
 
-ALTER TABLE ONLY employees.employee ALTER COLUMN id SET DEFAULT nextval('employees.id_employee_seq'::regclass);
-
-SELECT pg_catalog.setval('employees.id_employee_seq', 1, true);
 ```
 
 ### Department Table (employees.department)
 Stores department details.
 ```sql
 CREATE TABLE employees.department (
-id character varying(4) NOT NULL,
-dept_name character varying(40) NOT NULL,
-active boolean NOT NULL,
-created_by bigint NOT NULL,
-created_date timestamp with time zone DEFAULT now() NOT NULL,
-updated_by bigint NOT NULL,
-updated_date timestamp with time zone DEFAULT now() NOT NULL
+    id character varying(4) NOT NULL,
+    dept_name character varying(40) NOT NULL,
+    active boolean NOT NULL,
+    created_by bigint NOT NULL,
+    created_date timestamp with time zone DEFAULT now() NOT NULL,
+    updated_by bigint NOT NULL,
+    updated_date timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT department_pkey PRIMARY KEY (id)
 );
 
-ALTER TABLE ONLY employees.department
-ADD CONSTRAINT idx_16979_primary PRIMARY KEY (id);
 ```
 
 ### DepartmentEmployee Table (employees.department_employee)
 Maps employees to departments.
 ```sql
 CREATE TABLE employees.department_employee (
-employee_id bigint NOT NULL,
-department_id character varying(255) NOT NULL,
-from_date date NOT NULL,
-to_date date NOT NULL
+    employee_id bigint NOT NULL,
+    department_id character varying(255) NOT NULL,
+    from_date date NOT NULL,
+    to_date date NOT NULL,
+    CONSTRAINT department_employee_pkey PRIMARY KEY (employee_id, department_id)
 );
 
 ALTER TABLE ONLY employees.department_employee
-ADD CONSTRAINT idx_16982_primary PRIMARY KEY (employee_id, department_id);
+ADD CONSTRAINT department_employee_fkey1 FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 ALTER TABLE ONLY employees.department_employee
-ADD CONSTRAINT dept_emp_ibfk_1 FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-ALTER TABLE ONLY employees.department_employee
-ADD CONSTRAINT dept_emp_ibfk_2 FOREIGN KEY (department_id) REFERENCES employees.department(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+ADD CONSTRAINT department_employee_fkey2 FOREIGN KEY (department_id) REFERENCES employees.department(id) ON UPDATE RESTRICT ON DELETE CASCADE;
 ```
 
 ### Salary Table (employees.salary)
 Stores employee salaries.
 ```sql
 CREATE TABLE employees.salary (
-employee_id bigint NOT NULL,
-amount bigint NOT NULL,
-from_date date NOT NULL,
-to_date date NOT NULL
+    employee_id bigint NOT NULL,
+    amount bigint NOT NULL,
+    from_date date NOT NULL,
+    to_date date NOT NULL,
+    CONSTRAINT salary_pkey PRIMARY KEY (employee_id, from_date)
 );
 
 ALTER TABLE ONLY employees.salary
-ADD CONSTRAINT idx_16991_primary PRIMARY KEY (employee_id, from_date);
-
-ALTER TABLE ONLY employees.salary
-ADD CONSTRAINT salaries_ibfk_1 FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+ADD CONSTRAINT salary_fkey FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
 ```
 
 ### Title Table (employees.title)
 Stores employee titles.
 ```sql
 CREATE TABLE employees.title (
-employee_id bigint NOT NULL,
-title character varying(50) NOT NULL,
-from_date date NOT NULL,
-to_date date
+    employee_id bigint NOT NULL,
+    title character varying(50) NOT NULL,
+    from_date date NOT NULL,
+    to_date date,
+    CONSTRAINT title_pkey PRIMARY KEY (employee_id, title, from_date)
 );
 
 ALTER TABLE ONLY employees.title
-ADD CONSTRAINT idx_16994_primary PRIMARY KEY (employee_id, title, from_date);
-
-ALTER TABLE ONLY employees.title
-ADD CONSTRAINT titles_ibfk_1 FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+ADD CONSTRAINT title_fkey FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
 ```
 
 ### Relationships
@@ -259,8 +236,9 @@ public class CustomErrorController implements ErrorController {
 ## 🛠 Installation & Setup
 A step by step series of examples that tell you how to get a development env running.
 1. Clone the repository
-- git clone https://github.com/yoanesber/spring-boot-hibernate-one-to-many-postgresql.git
+- git clone https://github.com/yoanesber/Spring-Boot-Hibernate-One-To-Many-PostgreSQL.git
 2. Set up PostgreSQL
+- Run DDL PostgreSQL to create Database Schema
 - Configure the PostgreSQL database connection in application.properties
 3. Run the application locally
 - Make sure PostgreSQL is running, then execute: 
