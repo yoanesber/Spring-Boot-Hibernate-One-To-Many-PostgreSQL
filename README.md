@@ -253,31 +253,32 @@ These are APIs that we need to provide:
 ### Department API Endpoints
 Apis to create, retrieve, update, delete Department.
 - `GET` http://localhost:8081/api/v1/departments - Get all departments
+- `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department
 - `POST` http://localhost:8081/api/v1/departments - Create a new department with body request:
 ```json
 {
-    "id": "d011",
-    "deptName": "Security",
+    "id": "d001",
+    "deptName": "Information Technology",
     "active": "true",
     "createdBy": 1,
     "updatedBy": 1
 }
 ```
-- `PUT` http://localhost:8081/api/v1/departments/d011 - Update existing department with body request:
+- `PUT` http://localhost:8081/api/v1/departments/d001 - Update existing department with body request:
 ```json
 {
-    "id": "d011",
-    "deptName": "Operation",
-    "active": "false",
+    "id": "d001",
+    "deptName": "Technology & Security",
+    "active": "true",
     "updatedBy": 2
 }
 ```
-- `DELETE` http://localhost:8081/api/v1/departments/d011 - Delete existing department
+- `DELETE` http://localhost:8081/api/v1/departments/d001 - Delete existing department
 
 ### Employee API Endpoints
 Apis to create, retrieve, update, delete Employee
 - `GET` http://localhost:8081/api/v1/employees - Get all employees
-- `GET` http://localhost:8081/api/v1/employees/10036 - Get a specific employee
+- `GET` http://localhost:8081/api/v1/employees/1 - Get a specific employee
 - `POST` http://localhost:8081/api/v1/employees - Create a new employees with body request:
 ```json
 {
@@ -322,7 +323,7 @@ Apis to create, retrieve, update, delete Employee
     ]
 }
 ```
-- `PUT` http://localhost:8081/api/v1/employees/10036 - Update existing employee with body request:
+- `PUT` http://localhost:8081/api/v1/employees/1 - Update existing employee with body request:
 ```json
 {
     "birthDate": "1953-09-02",
@@ -355,7 +356,7 @@ Apis to create, retrieve, update, delete Employee
     ]
 }
 ```
-- `DELETE` http://localhost:8081/api/v1/employees/10037 - Delete an employee
+- `DELETE` http://localhost:8081/api/v1/employees/1 - Delete an employee
 ---
 
 This project follows best practices in Spring Boot development, ensuring efficiency and maintainability.
