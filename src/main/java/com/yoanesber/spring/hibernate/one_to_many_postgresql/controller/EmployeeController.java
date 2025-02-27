@@ -60,7 +60,7 @@ public class EmployeeController {
                     "No employees found", null));
             }
 
-            // Return the list of employees
+            // Return the response
             return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
                 "All employees fetched successfully", employees));
         } catch (Exception e) {
@@ -87,7 +87,7 @@ public class EmployeeController {
                     "Employee not found", null));
             }
 
-            // Return the employee
+            // Return the response
             return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
                 "Employee fetched successfully", employee));
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class EmployeeController {
                     "Employee not found", null));
             }
             
-            // Check if the employee is null
+            // Return the response
             return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
                 "Employee updated successfully", updatedEmployee));
         } catch (Exception e) {
@@ -143,7 +143,7 @@ public class EmployeeController {
                     "Employee not found", null));
             }
 
-            // Check if the employee is null
+            // Return the response
             return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
                 "Employee deleted successfully", null));
         } catch (Exception e) {

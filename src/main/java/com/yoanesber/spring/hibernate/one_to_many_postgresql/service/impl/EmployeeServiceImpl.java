@@ -221,6 +221,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     existingEmployee.getTitles().add(titleEmployee);
                 });
 
+                // Save the employee
                 return new EmployeeDTO(employeeRepository.save(existingEmployee));
             }
         } catch (Exception e) {
@@ -234,7 +235,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Assert.notNull(id, "Employee id cannot be null");
 
         try {
-            // Delete the employee
+            // Get the employee by id
             Employee employee = employeeRepository.findById(id)
                 .orElse(null);
 

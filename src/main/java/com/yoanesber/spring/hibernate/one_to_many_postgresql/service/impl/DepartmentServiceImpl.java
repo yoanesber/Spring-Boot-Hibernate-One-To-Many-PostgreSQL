@@ -28,7 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         Assert.notNull(departmentDTO, "Department cannot be null");
 
         try {
-            // Check if department exists
+            // Get existing department
             Department existingDepartment = departmentRepository.findById(departmentDTO.getId())
                 .orElse(null);
 
