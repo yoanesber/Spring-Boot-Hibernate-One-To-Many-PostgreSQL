@@ -18,11 +18,16 @@ The technology used in this project are:
 
 ## 📋 Project Structure
 The project follows a layered architecture with the following structure:
-- `controller` : Exposes REST API endpoints for handling requests and responses
-- `dto` : Data Transfer Objects (DTOs) for request/response payloads
-- `entity` : Entity classes representing database tables
-- `repository` : JPA repositories for database access
-- `service` : Business logic layer, separating service interfaces and their implementations
+```bash
+one-to-many-postgresql/
+│── src/main/java/com/yoanesber/spring/one_to_many_postgresql/
+│   ├── controller/            # REST controllers handling API requests
+│   ├── dto/                   # Data Transfer Objects for requests and responses
+│   ├── entity/                # Entity classes representing database tables
+│   ├── repository/            # JPA repositories for database access
+│   ├── service/               # Business logic layer
+│   │   ├── impl/              # Implementation of services
+```
 ---
 
 ## 📂 Environment Configuration
@@ -236,20 +241,25 @@ public class CustomErrorController implements ErrorController {
 ## 🛠 Installation & Setup
 A step by step series of examples that tell you how to get a development env running.
 1. Clone the repository
-- git clone https://github.com/yoanesber/Spring-Boot-Hibernate-One-To-Many-PostgreSQL.git
+```bash
+git clone https://github.com/yoanesber/Spring-Boot-Hibernate-One-To-Many-PostgreSQL.git
+```
+
 2. Set up PostgreSQL
 - Run DDL PostgreSQL to create Database Schema
 - Configure the PostgreSQL database connection in application.properties
+
 3. Run the application locally
 - Make sure PostgreSQL is running, then execute: 
-`mvn spring-boot:run `
+```bash
+mvn spring-boot:run
+```
 - The API will be available at http://localhost:8081/ 
 ---
 
 ## 🔗 API Endpoints
-I built a Spring Boot JPA Rest CRUD API for `Employee` and `Department` services.
-
 These are APIs that we need to provide:
+
 ### Department API Endpoints
 Apis to create, retrieve, update, delete Department.
 - `GET` http://localhost:8081/api/v1/departments - Get all departments
