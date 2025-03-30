@@ -1,59 +1,59 @@
-# ⚡REST API Spring Boot One To Many example with Hibernate and PostgreSQL
-Implement JPA/Hibernate One-To-Many mapping with Hibernate in a Spring Boot CRUD example using `@OneToMany` annotation
+# REST API Spring Boot One To Many example with Hibernate and PostgreSQL
+Implement JPA/Hibernate **One-To-Many** mapping with **Hibernate** in a Spring Boot CRUD example using `@OneToMany` annotation.
 
-## 🚀 Overview
-This project is a REST API built using `Spring Boot v3.4.2` to handle CRUD operations for `Employee` and `Department` entities. The project integrates `Spring Data JPA` with `Hibernate` as the default JPA provider and uses `PostgreSQL` as the database. It also includes a custom HTTP response and a **custom error controller** to override the default `/error` response.
-This project implements `One-To-Many` relationships between `Employee` as the parent entity and the child entities` DepartmentEmployee, SalaryEmployee, and TitleEmployee`. The relationship is managed using Spring Data JPA with Hibernate, and the project utilizes `EmbeddedId` for 1composite primary keys` in the relationship tables.
+## 📖 Overview
+This project is a REST API built using **Spring Boot** to handle CRUD operations for **Employee** and **Department** entities. The project integrates **Spring Data JPA with Hibernate** as the default JPA provider and uses **PostgreSQL** as the database. It also includes a custom HTTP response and a **custom error controller** to override the default `/error` response.
+This project implements `One-To-Many` relationships between **Employee** as the parent entity and the child entities `DepartmentEmployee`, `SalaryEmployee`, and `TitleEmployee`. The relationship is managed using Spring Data JPA with Hibernate, and the project utilizes `EmbeddedId` for `composite primary keys` in the relationship tables.  
 
 ---
 
-## ✨Tech Stack
-The technology used in this project are:
-- `Spring Boot 3.4.2` : Framework for building RESTful APIs
-- `Spring Data JPA with Hibernate` : Simplifying database interactions
-- `Spring Boot Starter Web` : Building RESTful APIs or web applications
-- `PostgreSQL` : Database for persisting Netflix Shows
-- `Lombok` : Reducing boilerplate code
+## 🤖 Tech Stack
+The technology used in this project are:  
+- `Spring Boot Starter Web` – Building RESTful APIs or web applications
+- `Spring Data JPA with Hibernate` – Simplifying database interactions
+- `PostgreSQL` – Database for persisting Netflix Shows
+- `Lombok` – Reducing boilerplate code
 ---
 
-## 📋 Project Structure
-The project follows a layered architecture with the following structure:
+## 🏗️ Project Structure
+The project is organized into the following package structure:
 ```bash
 one-to-many-postgresql/
 │── src/main/java/com/yoanesber/spring/one_to_many_postgresql/
-│   ├── controller/            # REST controllers handling API requests
-│   ├── dto/                   # Data Transfer Objects for requests and responses
-│   ├── entity/                # Entity classes representing database tables
-│   ├── repository/            # JPA repositories for database access
-│   ├── service/               # Business logic layer
-│   │   ├── impl/              # Implementation of services
+│   ├── 📂controller/            # REST controllers handling API requests
+│   ├── 📂dto/                   # Data Transfer Objects for requests and responses
+│   ├── 📂entity/                # Entity classes representing database tables
+│   ├── 📂repository/            # JPA repositories for database access
+│   ├── 📂service/               # Business logic layer
+│   │   ├── 📂impl/              # Implementation of services
 ```
 ---
 
-## 📂 Environment Configuration
-Configuration values are stored in `.env.development` and referenced in `application.properties`.
-
+## ⚙ Environment Configuration
+Configuration values are stored in `.env.development` and referenced in `application.properties`.  
 Example `.env.development` file content:
 ```properties
-# application
+# Application properties
 APP_PORT=8081
 SPRING_PROFILES_ACTIVE=development
  
-# postgres
+# Database properties
 SPRING_DATASOURCE_PORT=5432
-SPRING_DATASOURCE_USERNAME=myusername
-SPRING_DATASOURCE_PASSWORD=mypassword
-SPRING_DATASOURCE_DB=employees_development
+SPRING_DATASOURCE_USERNAME=your_username
+SPRING_DATASOURCE_PASSWORD=your_password
+SPRING_DATASOURCE_DB=your_db
+SPRING_DATASOURCE_SCHEMA=your_schema
 ```
 
 Example `application.properties` file content:
 ```properties
+# Application properties
 spring.application.name=one-to-many-postgresql
 server.port=${APP_PORT}
 spring.profiles.active=${SPRING_PROFILES_ACTIVE}
 
-## datasource
-spring.datasource.url=jdbc:postgresql://localhost:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DB}?currentSchema=employees
+# Database properties
+spring.datasource.url=jdbc:postgresql://localhost:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DB}?currentSchema==${SPRING_DATASOURCE_SCHEMA}
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 
@@ -63,27 +63,14 @@ server.error.include-message=always
 ```
 ---
 
-## 💾 Database Schema & Relationships
-The project uses PostgreSQL as its database, with a structured schema to store the data efficiently. Below is the DDL (Data Definition Language) used to create the database schema.
-
-### Create Schema Employees
-Database schema.
+## 💾 Database Schema (DDL – PostgreSQL)
+The following is the database schema for the PostgreSQL database used in this project:  
 ```sql
-CREATE SCHEMA employees;
-```
+CREATE SCHEMA your_schema;
 
-### Employee Table (employees.employee)
-Stores employee details.
-```sql
-CREATE SEQUENCE employees.id_employee_seq
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-
-CREATE TABLE employees.employee (
-    id bigint NOT NULL DEFAULT nextval('employees.id_employee_seq'::regclass),
+-- table your_schema.employee
+CREATE TABLE IF NOT EXISTS your_schema.employee (
+    id bigint NOT NULL GENERATED BY DEFAULT AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
     birth_date date NOT NULL,
     first_name character varying(20) NOT NULL,
     last_name character varying(20),
@@ -97,12 +84,8 @@ CREATE TABLE employees.employee (
     CONSTRAINT employee_pkey PRIMARY KEY (id),
 );
 
-```
-
-### Department Table (employees.department)
-Stores department details.
-```sql
-CREATE TABLE employees.department (
+-- table your_schema.department
+CREATE TABLE IF NOT EXISTS your_schema.department (
     id character varying(4) NOT NULL,
     dept_name character varying(40) NOT NULL,
     active boolean NOT NULL,
@@ -113,73 +96,57 @@ CREATE TABLE employees.department (
     CONSTRAINT department_pkey PRIMARY KEY (id)
 );
 
-```
-
-### DepartmentEmployee Table (employees.department_employee)
-Maps employees to departments.
-```sql
-CREATE TABLE employees.department_employee (
+-- table your_schema.department_employee
+CREATE TABLE IF NOT EXISTS your_schema.department_employee (
     employee_id bigint NOT NULL,
     department_id character varying(255) NOT NULL,
     from_date date NOT NULL,
     to_date date NOT NULL,
-    CONSTRAINT department_employee_pkey PRIMARY KEY (employee_id, department_id)
+    CONSTRAINT department_employee_pkey PRIMARY KEY (employee_id, department_id),
+    CONSTRAINT department_employee_fkey1 FOREIGN KEY (employee_id) REFERENCES your_schema.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE,
+    CONSTRAINT department_employee_fkey2 FOREIGN KEY (department_id) REFERENCES your_schema.department(id) ON UPDATE RESTRICT ON DELETE CASCADE
 );
 
-ALTER TABLE ONLY employees.department_employee
-ADD CONSTRAINT department_employee_fkey1 FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
-ALTER TABLE ONLY employees.department_employee
-ADD CONSTRAINT department_employee_fkey2 FOREIGN KEY (department_id) REFERENCES employees.department(id) ON UPDATE RESTRICT ON DELETE CASCADE;
-```
-
-### Salary Table (employees.salary)
-Stores employee salaries.
-```sql
-CREATE TABLE employees.salary (
+-- table your_schema.salary
+CREATE TABLE IF NOT EXISTS your_schema.salary (
     employee_id bigint NOT NULL,
     amount bigint NOT NULL,
     from_date date NOT NULL,
     to_date date NOT NULL,
-    CONSTRAINT salary_pkey PRIMARY KEY (employee_id, from_date)
+    CONSTRAINT salary_pkey PRIMARY KEY (employee_id, from_date),
+    CONSTRAINT salary_fkey FOREIGN KEY (employee_id) REFERENCES your_schema.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE
 );
 
-ALTER TABLE ONLY employees.salary
-ADD CONSTRAINT salary_fkey FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
-```
-
-### Title Table (employees.title)
-Stores employee titles.
-```sql
-CREATE TABLE employees.title (
+-- table your_schema.title
+CREATE TABLE IF NOT EXISTS your_schema.title (
     employee_id bigint NOT NULL,
     title character varying(50) NOT NULL,
     from_date date NOT NULL,
     to_date date,
-    CONSTRAINT title_pkey PRIMARY KEY (employee_id, title, from_date)
+    CONSTRAINT title_pkey PRIMARY KEY (employee_id, title, from_date),
+    CONSTRAINT title_fkey FOREIGN KEY (employee_id) REFERENCES your_schema.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE
 );
 
-ALTER TABLE ONLY employees.title
-ADD CONSTRAINT title_fkey FOREIGN KEY (employee_id) REFERENCES employees.employee(id) ON UPDATE RESTRICT ON DELETE CASCADE;
 ```
 
-### Relationships
-The following is the relationship between tables:
-- Department ↔ DepartmentEmployee (One-to-Many)
-- Employee ↔ DepartmentEmployee (One-to-Many)
-- Employee ↔ SalaryEmployee (One-to-Many)
-- Employee ↔ TitleEmployee (One-to-Many)
+### 🔗 Relationships
+The following is the relationship between tables:  
+- Department ↔ DepartmentEmployee (`One-to-Many`)
+- Employee ↔ DepartmentEmployee (`One-to-Many`)
+- Employee ↔ SalaryEmployee (`One-to-Many`)
+- Employee ↔ TitleEmployee (`One-to-Many`)
 
-### EmbeddedId
-These tables are managed using EmbeddedId to define composite primary keys:
-- employees.department_employee (employee_id, department_id)
-- employees.salary (employee_id, from_date)
-- employees.title (employee_id, title, from_date)
+### 🔢 EmbeddedId
+These tables are managed using `EmbeddedId` to define composite primary keys:  
+- department_employee (employee_id, department_id)
+- salary (employee_id, from_date)
+- title (employee_id, title, from_date)
 ---
 
-## 📜 Custom Handler
-### Custom HTTP Response
-This project includes a `CustomHttpResponse` entity to standardize API responses, ensuring consistency across all endpoints.
+## 🎛️ Custom Handler
+1. Custom HTTP Response
+This project includes a `CustomHttpResponse` entity to standardize API responses, ensuring consistency across all endpoints.  
 ```java
 public class CustomHttpResponse {
     private Integer statusCode;
@@ -195,12 +162,9 @@ public class CustomHttpResponse {
 }
 ```
 
-### Custom Error Handling
-The default `/error` response is overridden using a `CustomErrorController`, which provides a structured error response format.
-
+2. Custom Error Handling
+The default `/error` response is overridden using a `CustomErrorController`, which provides a structured error response format.  
 ```java
-import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.CustomHttpResponse;
-
 @RestController
 @RequestMapping("/error")
 public class CustomErrorController implements ErrorController {
@@ -238,32 +202,49 @@ public class CustomErrorController implements ErrorController {
 ```
 ---
 
-## 🛠 Installation & Setup
-A step by step series of examples that tell you how to get a development env running.
-1. Clone the repository
+## 🛠️ Installation & Setup
+A step by step series of examples that tell you how to get a development env running.  
+1. Ensure you have **Git installed on your Windows** machine, then clone the repository to your local environment:
 ```bash
 git clone https://github.com/yoanesber/Spring-Boot-Hibernate-One-To-Many-PostgreSQL.git
+cd Spring-Boot-Hibernate-One-To-Many-PostgreSQL
 ```
 
 2. Set up PostgreSQL
-- Run DDL PostgreSQL to create Database Schema
-- Configure the PostgreSQL database connection in application.properties
+- Run the provided DDL script to set up the database schema
+- Configure the connection in `.env.development` file:
+```properties
+# Database properties
+SPRING_DATASOURCE_PORT=5432
+SPRING_DATASOURCE_USERNAME=your_username
+SPRING_DATASOURCE_PASSWORD=your_password
+SPRING_DATASOURCE_DB=your_db
+SPRING_DATASOURCE_SCHEMA=your_schema
+```
 
 3. Run the application locally
-- Make sure PostgreSQL is running, then execute: 
+Make sure PostgreSQL is running, then execute:  
 ```bash
 mvn spring-boot:run
 ```
-- The API will be available at http://localhost:8081/ 
+
+
+4. Now, API is available at:  
+```bash
+http://localhost:8081/ 
+```
+
+You can test the API using: Postman (Desktop/Web version) or cURL
+
 ---
 
-## 🔗 API Endpoints
+## 🌐 API Endpoints
 These are APIs that we need to provide:
 
 ### Department API Endpoints
 Apis to create, retrieve, update, delete Department.
-- `GET` http://localhost:8081/api/v1/departments - Get all departments
-- `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department
+- `GET` http://localhost:8081/api/v1/departments - Get all departments.
+- `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department.
 - `POST` http://localhost:8081/api/v1/departments - Create a new department with body request:
 ```json
 {
@@ -367,6 +348,3 @@ Apis to create, retrieve, update, delete Employee
 }
 ```
 - `DELETE` http://localhost:8081/api/v1/employees/1 - Delete an employee
----
-
-This project follows best practices in Spring Boot development, ensuring efficiency and maintainability.
