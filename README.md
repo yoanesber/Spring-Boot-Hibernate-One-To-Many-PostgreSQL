@@ -245,6 +245,7 @@ These are APIs that we need to provide:
 Apis to create, retrieve, update, delete Department.
 - `GET` http://localhost:8081/api/v1/departments - Get all departments.
 - `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department.  
+
 **Successful Response:**
 ```json
 {
@@ -264,6 +265,7 @@ Apis to create, retrieve, update, delete Department.
 ```
 
 - `POST` http://localhost:8081/api/v1/departments - Create a new department.  
+
 **Request Body:**
 ```json
 {
@@ -286,6 +288,7 @@ Apis to create, retrieve, update, delete Department.
 ```
 
 - `PUT` http://localhost:8081/api/v1/departments/d001 - Update existing department.  
+
 **Request Body:**
 ```json
 {
@@ -315,6 +318,7 @@ Apis to create, retrieve, update, delete Department.
 ```
 
 - `DELETE` http://localhost:8081/api/v1/departments/d001 - Delete existing department.  
+
 **Successful Response:**
 ```json
 {
@@ -329,6 +333,7 @@ Apis to create, retrieve, update, delete Department.
 Apis to create, retrieve, update, delete Employee.  
 - `GET` http://localhost:8081/api/v1/employees - Get all employees.  
 - `GET` http://localhost:8081/api/v1/employees/1 - Get a specific employee.  
+
 **Successful Response:**
 ```json
 {
@@ -373,6 +378,7 @@ Apis to create, retrieve, update, delete Employee.
 ```
 
 - `POST` http://localhost:8081/api/v1/employees - Create a new employees.  
+
 **Request Body:**
 ```json
 {
@@ -419,6 +425,7 @@ Apis to create, retrieve, update, delete Employee.
 ```
 
 - `PUT` http://localhost:8081/api/v1/employees/1 - Update existing employee.  
+
 **Request Body:**
 ```json
 {
@@ -494,6 +501,7 @@ Apis to create, retrieve, update, delete Employee.
 ```
 
 - `DELETE` http://localhost:8081/api/v1/employees/1 - Delete an employee.  
+
 **Successful Response:**
 ```json
 {
