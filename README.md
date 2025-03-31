@@ -2,16 +2,17 @@
 Implement JPA/Hibernate **One-To-Many** mapping with **Hibernate** in a Spring Boot CRUD example using `@OneToMany` annotation.
 
 ## 📖 Overview
-This project is a REST API built using **Spring Boot** to handle CRUD operations for **Employee** and **Department** entities. The project integrates **Spring Data JPA with Hibernate** as the default JPA provider and uses **PostgreSQL** as the database. It also includes a custom HTTP response and a **custom error controller** to override the default `/error` response.
-This project implements `One-To-Many` relationships between **Employee** as the parent entity and the child entities `DepartmentEmployee`, `SalaryEmployee`, and `TitleEmployee`. The relationship is managed using Spring Data JPA with Hibernate, and the project utilizes `EmbeddedId` for `composite primary keys` in the relationship tables.  
+This project is a REST API built using **Spring Boot** to handle CRUD operations for **Employee** and **Department** entities. The project integrates **Spring Data JPA with Hibernate** as the default JPA provider and uses **PostgreSQL** as the database. It also includes a custom HTTP response and a **custom error controller** to override the default `/error` response.  
+
+This project implements `One-To-Many` relationships between **Employee** as the parent entity and the child entities **DepartmentEmployee, SalaryEmployee, and TitleEmployee**. The relationship is managed using Spring Data JPA with Hibernate, and the project utilizes `EmbeddedId` for `composite primary keys` in the relationship tables.  
 
 ---
 
 ## 🤖 Tech Stack
 The technology used in this project are:  
 - `Spring Boot Starter Web` – Building RESTful APIs or web applications
-- `Spring Data JPA with Hibernate` – Simplifying database interactions
 - `PostgreSQL` – Database for persisting Netflix Shows
+- `Hibernate` – Simplifying database interactions
 - `Lombok` – Reducing boilerplate code
 ---
 
@@ -31,7 +32,7 @@ one-to-many-postgresql/
 
 ## ⚙ Environment Configuration
 Configuration values are stored in `.env.development` and referenced in `application.properties`.  
-Example `.env.development` file content:
+Example `.env.development` file content:  
 ```properties
 # Application properties
 APP_PORT=8081
@@ -45,7 +46,7 @@ SPRING_DATASOURCE_DB=your_db
 SPRING_DATASOURCE_SCHEMA=your_schema
 ```
 
-Example `application.properties` file content:
+Example `application.properties` file content:  
 ```properties
 # Application properties
 spring.application.name=one-to-many-postgresql
@@ -228,7 +229,6 @@ Make sure PostgreSQL is running, then execute:
 mvn spring-boot:run
 ```
 
-
 4. Now, API is available at:  
 ```bash
 http://localhost:8081/ 
@@ -239,13 +239,32 @@ You can test the API using: Postman (Desktop/Web version) or cURL
 ---
 
 ## 🌐 API Endpoints
-These are APIs that we need to provide:
+These are APIs that we need to provide:  
 
 ### Department API Endpoints
 Apis to create, retrieve, update, delete Department.
 - `GET` http://localhost:8081/api/v1/departments - Get all departments.
-- `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department.
-- `POST` http://localhost:8081/api/v1/departments - Create a new department with body request:
+- `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department.  
+**Successful Response:**
+```json
+{
+    "statusCode": 200,
+    "timestamp": "2025-03-31T10:30:15.8322985",
+    "message": "Department fetched successfully",
+    "data": {
+        "id": "d011",
+        "deptName": "Operation",
+        "active": true,
+        "createdBy": 1001,
+        "createdDate": "2025-03-20T03:00:00.000+00:00",
+        "updatedBy": 1001,
+        "updatedDate": "2025-03-20T03:00:00.000+00:00"
+    }
+}
+```
+
+- `POST` http://localhost:8081/api/v1/departments - Create a new department.  
+**Request Body:**
 ```json
 {
     "id": "d001",
@@ -255,7 +274,19 @@ Apis to create, retrieve, update, delete Department.
     "updatedBy": 1
 }
 ```
-- `PUT` http://localhost:8081/api/v1/departments/d001 - Update existing department with body request:
+
+**Successful Response:**
+```json
+{
+    "statusCode": 201,
+    "timestamp": "2025-03-31T10:34:20.8317982",
+    "message": "Department saved successfully",
+    "data": null
+}
+```
+
+- `PUT` http://localhost:8081/api/v1/departments/d001 - Update existing department.  
+**Request Body:**
 ```json
 {
     "id": "d001",
@@ -264,87 +295,211 @@ Apis to create, retrieve, update, delete Department.
     "updatedBy": 2
 }
 ```
-- `DELETE` http://localhost:8081/api/v1/departments/d001 - Delete existing department
 
-### Employee API Endpoints
-Apis to create, retrieve, update, delete Employee
-- `GET` http://localhost:8081/api/v1/employees - Get all employees
-- `GET` http://localhost:8081/api/v1/employees/1 - Get a specific employee
-- `POST` http://localhost:8081/api/v1/employees - Create a new employees with body request:
+**Successful Response:**
 ```json
 {
-    "birthDate": "1953-09-02",
+    "statusCode": 200,
+    "timestamp": "2025-03-31T10:34:59.9032581",
+    "message": "Department updated successfully",
+    "data": {
+        "id": "d001",
+        "deptName": "Technology & Security",
+        "active": true,
+        "createdBy": 1,
+        "createdDate": "2025-03-31T03:34:20.792+00:00",
+        "updatedBy": 2,
+        "updatedDate": "2025-03-31T03:34:59.891+00:00"
+    }
+}
+```
+
+- `DELETE` http://localhost:8081/api/v1/departments/d001 - Delete existing department.  
+**Successful Response:**
+```json
+{
+    "statusCode": 200,
+    "timestamp": "2025-03-31T10:31:39.148143",
+    "message": "Department deleted successfully",
+    "data": null
+}
+```
+
+### Employee API Endpoints
+Apis to create, retrieve, update, delete Employee.  
+- `GET` http://localhost:8081/api/v1/employees - Get all employees.  
+- `GET` http://localhost:8081/api/v1/employees/1 - Get a specific employee.  
+**Successful Response:**
+```json
+{
+    "statusCode": 200,
+    "timestamp": "2025-03-31T10:37:05.9835263",
+    "message": "Employee fetched successfully",
+    "data": {
+        "id": 1,
+        "birthDate": "1990-08-01",
+        "firstName": "YOANES",
+        "lastName": "BERCHMANS",
+        "gender": "M",
+        "hireDate": "2000-01-01",
+        "activeStatus": true,
+        "createdBy": 1,
+        "createdDate": "2025-02-27T13:50:50.779+00:00",
+        "updatedBy": 2,
+        "updatedDate": "2025-02-27T13:51:19.361+00:00",
+        "departments": [
+            {
+                "departmentId": "d002",
+                "fromDate": "2000-01-01",
+                "toDate": "2005-12-31"
+            }
+        ],
+        "salaries": [
+            {
+                "fromDate": "2000-01-01",
+                "amount": 60116,
+                "toDate": "2005-12-31"
+            }
+        ],
+        "titles": [
+            {
+                "title": "Senior Engineer",
+                "fromDate": "2000-01-01",
+                "toDate": "2005-12-31"
+            }
+        ]
+    }
+}
+```
+
+- `POST` http://localhost:8081/api/v1/employees - Create a new employees.  
+**Request Body:**
+```json
+{
+    "birthDate": "1990-08-01",
     "firstName": "YOANES",
     "lastName": "BERCHMANS",
     "gender": "M",
-    "hireDate": "1986-06-27",
+    "hireDate": "2000-01-01",
     "activeStatus": true,
     "createdBy": 1,
     "updatedBy": 1,
     "departments": [
         {
             "departmentId": "d002",
-            "fromDate": "2024-01-01",
-            "toDate": "2024-01-31"
-        },
-        {
-            "departmentId": "d001",
-            "fromDate": "2024-02-01",
-            "toDate": "2024-02-29"
+            "fromDate": "2000-01-01",
+            "toDate": "2005-12-31"
         }
     ],
     "salaries": [
         {
-            "fromDate": "1986-06-26",
+            "fromDate": "2000-01-01",
             "amount": 60116,
-            "toDate": "1987-06-27"
+            "toDate": "2005-12-31"
         }
     ],
     "titles": [
         {
             "title": "Senior Engineer",
-            "fromDate": "1986-06-26",
-            "toDate": "1986-06-30"
-        },
-        {
-            "title": "Engineer Manager",
-            "fromDate": "1986-07-01",
-            "toDate": "1986-07-31"
+            "fromDate": "2000-01-01",
+            "toDate": "2005-12-31"
         }
     ]
 }
 ```
-- `PUT` http://localhost:8081/api/v1/employees/1 - Update existing employee with body request:
+
+**Successful Response:**
 ```json
 {
-    "birthDate": "1953-09-02",
+    "statusCode": 201,
+    "timestamp": "2025-03-31T10:46:07.7919509",
+    "message": "Employee saved successfully",
+    "data": null
+}
+```
+
+- `PUT` http://localhost:8081/api/v1/employees/1 - Update existing employee.  
+**Request Body:**
+```json
+{
+    "birthDate": "1990-08-01",
     "firstName": "YOANES",
     "lastName": "BERCHMANS",
     "gender": "M",
-    "hireDate": "1986-07-27",
+    "hireDate": "2000-01-01",
     "activeStatus": true,
     "updatedBy": 2,
     "departments": [
         {
             "departmentId": "d002",
-            "fromDate": "2024-01-01",
-            "toDate": "2024-01-31"
+            "fromDate": "2000-01-01",
+            "toDate": "2005-12-31"
         }
     ],
     "salaries": [
         {
-            "fromDate": "1986-06-26",
+            "fromDate": "2000-01-01",
             "amount": 60116,
-            "toDate": "1987-06-27"
+            "toDate": "2005-12-31"
         }
     ],
     "titles": [
         {
             "title": "Senior Engineer",
-            "fromDate": "1986-06-26",
-            "toDate": "1986-06-30"
+            "fromDate": "2000-01-01",
+            "toDate": "2005-12-31"
         }
     ]
 }
 ```
-- `DELETE` http://localhost:8081/api/v1/employees/1 - Delete an employee
+
+**Successful Response:**
+```json
+{
+    "statusCode": 200,
+    "timestamp": "2025-03-31T10:47:43.8114794",
+    "message": "Employee updated successfully",
+    "data": {
+        "id": 1,
+        "birthDate": "1990-08-01",
+        "firstName": "YOANES",
+        "lastName": "BERCHMANS",
+        "gender": "M",
+        "hireDate": "2000-01-01",
+        "activeStatus": true,
+        "updatedBy": 2,
+        "departments": [
+            {
+                "departmentId": "d002",
+                "fromDate": "2000-01-01",
+                "toDate": "2005-12-31"
+            }
+        ],
+        "salaries": [
+            {
+                "fromDate": "2000-01-01",
+                "amount": 60116,
+                "toDate": "2005-12-31"
+            }
+        ],
+        "titles": [
+            {
+                "title": "Senior Engineer",
+                "fromDate": "2000-01-01",
+                "toDate": "2005-12-31"
+            }
+        ]
+    }
+}
+```
+
+- `DELETE` http://localhost:8081/api/v1/employees/1 - Delete an employee.  
+**Successful Response:**
+```json
+{
+    "statusCode": 200,
+    "timestamp": "2025-03-31T10:50:45.6541365",
+    "message": "Employee deleted successfully",
+    "data": null
+}
+```
