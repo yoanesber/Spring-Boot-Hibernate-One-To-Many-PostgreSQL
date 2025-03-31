@@ -253,7 +253,7 @@ Apis to create, retrieve, update, delete Department.
     "timestamp": "2025-03-31T10:30:15.8322985",
     "message": "Department fetched successfully",
     "data": {
-        "id": "d011",
+        "id": "d001",
         "deptName": "Operation",
         "active": true,
         "createdBy": 1001,
