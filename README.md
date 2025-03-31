@@ -58,7 +58,7 @@ spring.datasource.url=jdbc:postgresql://localhost:${SPRING_DATASOURCE_PORT}/${SP
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 
-## server error handling
+## Server error properties
 server.error.whitelabel.enabled=false
 server.error.include-message=always
 ```
@@ -146,8 +146,10 @@ These tables are managed using `EmbeddedId` to define composite primary keys:
 ---
 
 ## 🎛️ Custom Handler
-1. Custom HTTP Response
-This project includes a `CustomHttpResponse` entity to standardize API responses, ensuring consistency across all endpoints.  
+This project implements a Custom Handler to manage HTTP responses and error handling efficiently.  
+
+1. Custom HTTP Response  
+Custom HTTP Response structure ensures consistency across API responses, including metadata such as timestamps, status codes, and meaningful messages.  
 ```java
 public class CustomHttpResponse {
     private Integer statusCode;
@@ -163,7 +165,7 @@ public class CustomHttpResponse {
 }
 ```
 
-2. Custom Error Handling
+2. Custom Error Handling  
 The default `/error` response is overridden using a `CustomErrorController`, which provides a structured error response format.  
 ```java
 @RestController
@@ -292,7 +294,6 @@ Apis to create, retrieve, update, delete Department.
 **Request Body:**
 ```json
 {
-    "id": "d001",
     "deptName": "Technology & Security",
     "active": "true",
     "updatedBy": 2
