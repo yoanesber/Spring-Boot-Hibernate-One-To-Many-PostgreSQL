@@ -1,23 +1,30 @@
-# REST API Spring Boot One To Many example with Hibernate and PostgreSQL
-Implement JPA/Hibernate **One-To-Many** mapping with **Hibernate** in a Spring Boot CRUD example using `@OneToMany` annotation.
+# REST API Spring Boot One To Many example with Hibernate and PostgreSQL  
 
-## 📖 Overview
+Implement JPA/Hibernate **One-To-Many** mapping with **Hibernate** in a Spring Boot CRUD example using `@OneToMany` annotation.  
+
+## 📖 Overview  
+
 This project is a REST API built using **Spring Boot** to handle CRUD operations for **Employee** and **Department** entities. The project integrates **Spring Data JPA with Hibernate** as the default JPA provider and uses **PostgreSQL** as the database. It also includes a custom HTTP response and a **custom error controller** to override the default `/error` response.  
 
 This project implements `One-To-Many` relationships between **Employee** as the parent entity and the child entities **DepartmentEmployee, SalaryEmployee, and TitleEmployee**. The relationship is managed using Spring Data JPA with Hibernate, and the project utilizes `EmbeddedId` for `composite primary keys` in the relationship tables.  
 
 ---
 
-## 🤖 Tech Stack
+## 🤖 Tech Stack  
+
 The technology used in this project are:  
+
 - `Spring Boot Starter Web` – Building RESTful APIs or web applications
 - `PostgreSQL` – Database for persisting Netflix Shows
 - `Hibernate` – Simplifying database interactions
 - `Lombok` – Reducing boilerplate code
+
 ---
 
-## 🏗️ Project Structure
-The project is organized into the following package structure:
+## 🏗️ Project Structure  
+
+The project is organized into the following package structure:  
+
 ```bash
 one-to-many-postgresql/
 │── src/main/java/com/yoanesber/spring/one_to_many_postgresql/
@@ -30,9 +37,11 @@ one-to-many-postgresql/
 ```
 ---
 
-## ⚙ Environment Configuration
+## ⚙ Environment Configuration  
+
 Configuration values are stored in `.env.development` and referenced in `application.properties`.  
 Example `.env.development` file content:  
+
 ```properties
 # Application properties
 APP_PORT=8081
@@ -47,6 +56,7 @@ SPRING_DATASOURCE_SCHEMA=your_schema
 ```
 
 Example `application.properties` file content:  
+
 ```properties
 # Application properties
 spring.application.name=one-to-many-postgresql
@@ -64,8 +74,10 @@ server.error.include-message=always
 ```
 ---
 
-## 💾 Database Schema (DDL – PostgreSQL)
+## 💾 Database Schema (DDL – PostgreSQL)  
+
 The following is the database schema for the PostgreSQL database used in this project:  
+
 ```sql
 CREATE SCHEMA your_schema;
 
@@ -131,25 +143,33 @@ CREATE TABLE IF NOT EXISTS your_schema.title (
 
 ```
 
-### 🔗 Relationships
+### 🔗 Relationships  
+
 The following is the relationship between tables:  
+
 - Department ↔ DepartmentEmployee (`One-to-Many`)
 - Employee ↔ DepartmentEmployee (`One-to-Many`)
 - Employee ↔ SalaryEmployee (`One-to-Many`)
 - Employee ↔ TitleEmployee (`One-to-Many`)
 
-### 🔢 EmbeddedId
+### 🔢 EmbeddedId  
+
 These tables are managed using `EmbeddedId` to define composite primary keys:  
+
 - department_employee (employee_id, department_id)
 - salary (employee_id, from_date)
 - title (employee_id, title, from_date)
+
 ---
 
-## 🎛️ Custom Handler
+## 🎛️ Custom Handler  
+
 This project implements a Custom Handler to manage HTTP responses and error handling efficiently.  
 
 1. Custom HTTP Response  
+
 Custom HTTP Response structure ensures consistency across API responses, including metadata such as timestamps, status codes, and meaningful messages.  
+
 ```java
 public class CustomHttpResponse {
     private Integer statusCode;
@@ -166,7 +186,9 @@ public class CustomHttpResponse {
 ```
 
 2. Custom Error Handling  
+
 The default `/error` response is overridden using a `CustomErrorController`, which provides a structured error response format.  
+
 ```java
 @RestController
 @RequestMapping("/error")
@@ -205,17 +227,22 @@ public class CustomErrorController implements ErrorController {
 ```
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Installation & Setup  
+
 A step by step series of examples that tell you how to get a development env running.  
-1. Ensure you have **Git installed on your Windows** machine, then clone the repository to your local environment:
+
+1. Ensure you have **Git installed on your Windows** machine, then clone the repository to your local environment:  
+
 ```bash
 git clone https://github.com/yoanesber/Spring-Boot-Hibernate-One-To-Many-PostgreSQL.git
 cd Spring-Boot-Hibernate-One-To-Many-PostgreSQL
 ```
 
-2. Set up PostgreSQL
+2. Set up PostgreSQL  
+
 - Run the provided DDL script to set up the database schema
-- Configure the connection in `.env.development` file:
+- Configure the connection in `.env.development` file:  
+
 ```properties
 # Database properties
 SPRING_DATASOURCE_PORT=5432
@@ -227,11 +254,13 @@ SPRING_DATASOURCE_SCHEMA=your_schema
 
 3. Run the application locally
 Make sure PostgreSQL is running, then execute:  
+
 ```bash
 mvn spring-boot:run
 ```
 
 4. Now, API is available at:  
+
 ```bash
 http://localhost:8081/ 
 ```
@@ -240,15 +269,19 @@ You can test the API using: Postman (Desktop/Web version) or cURL
 
 ---
 
-## 🌐 API Endpoints
+## 🌐 API Endpoints  
+
 These are APIs that we need to provide:  
 
-### Department API Endpoints
-Apis to create, retrieve, update, delete Department.
+### Department API Endpoints  
+
+Apis to create, retrieve, update, delete Department.  
+
 - `GET` http://localhost:8081/api/v1/departments - Get all departments.
 - `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department.  
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 200,
@@ -268,7 +301,8 @@ Apis to create, retrieve, update, delete Department.
 
 - `POST` http://localhost:8081/api/v1/departments - Create a new department.  
 
-**Request Body:**
+**Request Body:**  
+
 ```json
 {
     "id": "d001",
@@ -279,7 +313,8 @@ Apis to create, retrieve, update, delete Department.
 }
 ```
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 201,
@@ -291,7 +326,8 @@ Apis to create, retrieve, update, delete Department.
 
 - `PUT` http://localhost:8081/api/v1/departments/d001 - Update existing department.  
 
-**Request Body:**
+**Request Body:**  
+
 ```json
 {
     "deptName": "Technology & Security",
@@ -300,7 +336,8 @@ Apis to create, retrieve, update, delete Department.
 }
 ```
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 200,
@@ -320,7 +357,8 @@ Apis to create, retrieve, update, delete Department.
 
 - `DELETE` http://localhost:8081/api/v1/departments/d001 - Delete existing department.  
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 200,
@@ -330,12 +368,15 @@ Apis to create, retrieve, update, delete Department.
 }
 ```
 
-### Employee API Endpoints
+### Employee API Endpoints  
+
 Apis to create, retrieve, update, delete Employee.  
+
 - `GET` http://localhost:8081/api/v1/employees - Get all employees.  
 - `GET` http://localhost:8081/api/v1/employees/1 - Get a specific employee.  
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 200,
@@ -380,7 +421,8 @@ Apis to create, retrieve, update, delete Employee.
 
 - `POST` http://localhost:8081/api/v1/employees - Create a new employees.  
 
-**Request Body:**
+**Request Body:**  
+
 ```json
 {
     "birthDate": "1990-08-01",
@@ -415,7 +457,8 @@ Apis to create, retrieve, update, delete Employee.
 }
 ```
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 201,
@@ -427,7 +470,8 @@ Apis to create, retrieve, update, delete Employee.
 
 - `PUT` http://localhost:8081/api/v1/employees/1 - Update existing employee.  
 
-**Request Body:**
+**Request Body:**  
+
 ```json
 {
     "birthDate": "1990-08-01",
@@ -461,7 +505,8 @@ Apis to create, retrieve, update, delete Employee.
 }
 ```
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 200,
@@ -503,7 +548,8 @@ Apis to create, retrieve, update, delete Employee.
 
 - `DELETE` http://localhost:8081/api/v1/employees/1 - Delete an employee.  
 
-**Successful Response:**
+**Successful Response:**  
+
 ```json
 {
     "statusCode": 200,
