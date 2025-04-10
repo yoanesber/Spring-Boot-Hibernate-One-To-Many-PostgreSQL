@@ -39,26 +39,12 @@ one-to-many-postgresql/
 
 ## ⚙ Environment Configuration  
 
-Configuration values are stored in `.env.development` and referenced in `application.properties`.  
-Example `.env.development` file content:  
+The application uses externalized configuration via Spring Boot's `application.properties` file, leveraging environment variables to support flexible deployment across different environments (development, staging, production, etc.).  
+
+Below is a breakdown of the key configurations:  
 
 ```properties
-# Application properties
-APP_PORT=8081
-SPRING_PROFILES_ACTIVE=development
- 
-# Database properties
-SPRING_DATASOURCE_PORT=5432
-SPRING_DATASOURCE_USERNAME=your_username
-SPRING_DATASOURCE_PASSWORD=your_password
-SPRING_DATASOURCE_DB=your_db
-SPRING_DATASOURCE_SCHEMA=your_schema
-```
-
-Example `application.properties` file content:  
-
-```properties
-# Application properties
+# Application environment variables
 spring.application.name=one-to-many-postgresql
 server.port=${APP_PORT}
 spring.profiles.active=${SPRING_PROFILES_ACTIVE}
@@ -67,10 +53,6 @@ spring.profiles.active=${SPRING_PROFILES_ACTIVE}
 spring.datasource.url=jdbc:postgresql://localhost:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DB}?currentSchema==${SPRING_DATASOURCE_SCHEMA}
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
 spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
-
-## Server error properties
-server.error.whitelabel.enabled=false
-server.error.include-message=always
 ```
 ---
 
@@ -162,74 +144,10 @@ These tables are managed using `EmbeddedId` to define composite primary keys:
 
 ---
 
-## 🎛️ Custom Handler  
-
-This project implements a Custom Handler to manage HTTP responses and error handling efficiently.  
-
-1. Custom HTTP Response  
-
-Custom HTTP Response structure ensures consistency across API responses, including metadata such as timestamps, status codes, and meaningful messages.  
-
-```java
-public class CustomHttpResponse {
-    private Integer statusCode;
-    private LocalDateTime timestamp = LocalDateTime.now();
-    private String message;
-    private Object data;
-
-    public CustomHttpResponse(Integer statusCode, String message, Object data) {
-        this.statusCode = statusCode;
-        this.message = message;
-        this.data = data;
-    }
-}
-```
-
-2. Custom Error Handling  
-
-The default `/error` response is overridden using a `CustomErrorController`, which provides a structured error response format.  
-
-```java
-@RestController
-@RequestMapping("/error")
-public class CustomErrorController implements ErrorController {
-    @RequestMapping
-    public ResponseEntity<CustomHttpResponse> handleError(HttpServletRequest request) {
-        CustomHttpResponse errorDetails = new CustomHttpResponse();
-        errorDetails.setTimestamp(LocalDateTime.now());
- 
-        Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        String message = (String) request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
- 
-        if (statusCode == null) {
-            statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
-        }
-       
-        if (statusCode == HttpStatus.NOT_FOUND.value()) {
-            message = "The requested resource was not found";
-        } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
-            message = "You don't have permission to access this resource";
-        } else if (statusCode == HttpStatus.BAD_REQUEST.value()) {
-            message = "The request was invalid or cannot be served";
-        } else if (statusCode == HttpStatus.UNAUTHORIZED.value()) {
-            message = "You need to authenticate to access this resource";
-        } else {
-            message = (message != null) ? message : "Unexpected error occurred";
-        }
-
-        errorDetails.setStatusCode(statusCode);
-        errorDetails.setMessage(message);
-        errorDetails.setData(null);
- 
-        return new ResponseEntity<>(errorDetails, HttpStatus.valueOf(statusCode));
-    }
-}
-```
----
 
 ## 🛠️ Installation & Setup  
 
-A step by step series of examples that tell you how to get a development env running.  
+To get started with the **REST API Spring Boot One To Many example with Hibernate and PostgreSQL**, follow the steps below to configure your environment properly.  
 
 1. Ensure you have **Git installed on your Windows** machine, then clone the repository to your local environment:  
 
@@ -240,17 +158,19 @@ cd Spring-Boot-Hibernate-One-To-Many-PostgreSQL
 
 2. Set up PostgreSQL  
 
+The application connects to a PostgreSQL database for persistent storage of employee, department, salary, and title data.  
+
 - Run the provided DDL script to set up the database schema
 - Configure the connection in `.env.development` file:  
 
 ```properties
 # Database properties
-SPRING_DATASOURCE_PORT=5432
-SPRING_DATASOURCE_USERNAME=your_username
-SPRING_DATASOURCE_PASSWORD=your_password
-SPRING_DATASOURCE_DB=your_db
-SPRING_DATASOURCE_SCHEMA=your_schema
+spring.datasource.url=jdbc:postgresql://localhost:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DB}?currentSchema==${SPRING_DATASOURCE_SCHEMA}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 ```
+
+Once configured, make sure the PostgreSQL instance is running and accessible before starting the Spring Boot application.  
 
 3. Run the application locally
 Make sure PostgreSQL is running, then execute:  
@@ -277,7 +197,8 @@ These are APIs that we need to provide:
 
 Apis to create, retrieve, update, delete Department.  
 
-- `GET` http://localhost:8081/api/v1/departments - Get all departments.
+- `GET` http://localhost:8081/api/v1/departments - Get all departments.  
+
 - `GET` http://localhost:8081/api/v1/departments/d001 - Get a specific department.  
 
 **Successful Response:**  
@@ -373,6 +294,7 @@ Apis to create, retrieve, update, delete Department.
 Apis to create, retrieve, update, delete Employee.  
 
 - `GET` http://localhost:8081/api/v1/employees - Get all employees.  
+
 - `GET` http://localhost:8081/api/v1/employees/1 - Get a specific employee.  
 
 **Successful Response:**  
@@ -558,3 +480,32 @@ Apis to create, retrieve, update, delete Employee.
     "data": null
 }
 ```
+
+---
+
+## 📝 Notes & Future Enhancements  
+
+### Current Notes  
+
+- This project demonstrates a **RESTful API implementation using Spring Boot** to model and manage a **One-to-Many relationship** using **Spring Data JPA** and **Hibernate**.  
+- The underlying database is **PostgreSQL**, with schema relationships mapped via JPA annotations (e.g., `@OneToMany`, `@ManyToOne`, `@JoinColumn`).  
+- The API provides full **CRUD operations** on parent and child entities using Spring Boot's REST controller support.  
+- This is a foundational project focused on relational data modeling and persistence — **no authentication or authorization mechanism** is implemented yet.  
+
+
+### Planned Enhancements  
+
+- **Implement Security Layer**  
+
+Add **Spring Security** or **JWT-based authentication** to secure REST endpoints and restrict access to sensitive data.  
+
+- **GraphQL Subscriptions**  
+
+Implement **GraphQL subscriptions** to enable real-time notifications when an employee is created, updated, or deleted. This would be useful for reactive client-side applications.  
+
+---
+
+## 🔗 Related Repositories  
+
+- REST API + JWT Authentication Repository, check out [Netflix Shows REST API with JWT Authentication](https://github.com/yoanesber/Spring-Boot-JWT-Auth-PostgreSQL).  
+- Graphql API + PostgreSQL Repository, check out [Spring Boot GraphQL API for Employee & Department Management](https://github.com/yoanesber/Spring-Boot-Graphql-Employee-Management).  

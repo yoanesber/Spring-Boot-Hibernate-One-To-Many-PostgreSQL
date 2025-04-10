@@ -22,10 +22,6 @@ public class DepartmentEmployeeServiceImpl implements DepartmentEmployeeService 
     public DepartmentEmployee saveDepartmentEmployee(DepartmentEmployee departmentEmployee) {
         Assert.notNull(departmentEmployee, "DepartmentEmployee cannot be null");
 
-        try {
-            return departmentEmployeeRepository.save(departmentEmployee);
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving department employee: " + e.getMessage());
-        }
+        return departmentEmployeeRepository.save(departmentEmployee);
     }
 }

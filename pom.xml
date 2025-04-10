@@ -81,6 +81,18 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<environmentVariables>
+						<!-- # Application environment variables for development -->
+						<APP_PORT>8081</APP_PORT>
+						<SPRING_PROFILES_ACTIVE>development</SPRING_PROFILES_ACTIVE>
+
+						<!-- # Database environment variables for development -->
+						<SPRING_DATASOURCE_PORT>5432</SPRING_DATASOURCE_PORT>
+						<SPRING_DATASOURCE_USERNAME>postgres</SPRING_DATASOURCE_USERNAME>
+						<SPRING_DATASOURCE_PASSWORD>P@ssw0rd</SPRING_DATASOURCE_PASSWORD>
+						<SPRING_DATASOURCE_DB>github_yoanesber</SPRING_DATASOURCE_DB>
+						<SPRING_DATASOURCE_SCHEMA>employees</SPRING_DATASOURCE_SCHEMA>
+					</environmentVariables>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

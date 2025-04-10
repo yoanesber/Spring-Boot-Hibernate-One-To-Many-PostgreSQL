@@ -23,10 +23,6 @@ public class TitleEmployeeServiceImpl implements TitleEmployeeService {
     public TitleEmployee saveTitleEmployee(TitleEmployee titleEmployee) {
         Assert.notNull(titleEmployee, "TitleEmployee cannot be null");
 
-        try {
-            return titleEmployeeRepository.save(titleEmployee);
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving titleEmployee: " + e.getMessage());
-        }
+        return titleEmployeeRepository.save(titleEmployee);
     }
 }

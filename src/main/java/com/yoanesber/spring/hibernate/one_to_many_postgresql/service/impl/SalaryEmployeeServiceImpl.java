@@ -22,10 +22,6 @@ public class SalaryEmployeeServiceImpl implements SalaryEmployeeService {
     public SalaryEmployee saveSalaryEmployee(SalaryEmployee salaryEmployee) {
         Assert.notNull(salaryEmployee, "SalaryEmployee cannot be null");
 
-        try {
-            return salaryEmployeeRepository.save(salaryEmployee);
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving salary employee: " + e.getMessage());
-        }
+        return salaryEmployeeRepository.save(salaryEmployee);
     }
 }
