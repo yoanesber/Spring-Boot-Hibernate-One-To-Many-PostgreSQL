@@ -911,7 +911,6 @@ DELETE http://localhost:8080/api/v1/employees/11
 ### Planned Enhancements  
 
 - **Implement Security Layer** – Add **Spring Security** or **JWT-based authentication** to secure REST endpoints and restrict access to sensitive data.  
-- **GraphQL Subscriptions** – Implement **GraphQL subscriptions** to enable real-time notifications when an employee is created, updated, or deleted. This would be useful for reactive client-side applications.  
 
 ---
 
