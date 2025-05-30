@@ -1,20 +1,24 @@
 package com.yoanesber.spring.hibernate.one_to_many_postgresql.entity;
 
-import java.sql.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import java.sql.Date;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+/**
+ * Represents the association between a Title and an Employee.
+ * This entity is used to track the title of an employee along with the date from which the title is effective.
+ */
 
 @Data
 @Getter
@@ -27,17 +31,35 @@ public class TitleEmployee {
     @EmbeddedId
     private TitleEmployeeId id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "to_date")
+    private Date toDate;
+
+    @ManyToOne
     @MapsId("employeeId")
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @Column(name = "to_date")
-    private Date toDate;
+    @Override
+    public String toString() {
+        return "TitleEmployee{" +
+                "id=" + id.toString() +
+                ", toDate=" + toDate +
+                '}';
+    }
 
-    // Constructor to ensure ID is properly set
-    public TitleEmployee(Employee employee, String title, Date fromDate) {
-        this.employee = employee;
-        this.id = new TitleEmployeeId(employee.getId(), title, fromDate); // Ensure ID is set
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TitleEmployee)) return false;
+
+        TitleEmployee that = (TitleEmployee) o;
+
+        return id.equals(that.id) &&
+               toDate.equals(that.toDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, toDate);
     }
 }

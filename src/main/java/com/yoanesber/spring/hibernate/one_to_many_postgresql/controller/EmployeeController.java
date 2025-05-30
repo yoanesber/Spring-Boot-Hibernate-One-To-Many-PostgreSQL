@@ -1,8 +1,6 @@
 package com.yoanesber.spring.hibernate.one_to_many_postgresql.controller;
 
 import java.util.List;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,143 +10,201 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.dto.EmployeeDTO;
-import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.CustomHttpResponse;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.dto.HttpResponseDTO;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.Employee;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.mapper.EmployeeMapper;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.EmployeeService;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.util.ResponseUtil;
+
+/**
+ * EmployeeController handles HTTP requests related to employees.
+ * It provides endpoints to create, retrieve, update, and delete employees.
+ */
 
 @RestController
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
-    
     private final EmployeeService employeeService;
+
+    private static final String INVALID_REQUEST = "Invalid Request";
+    private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+    private static final String RECORD_NOT_FOUND = "Record not found";
+    private static final String RECORD_RETRIEVED_SUCCESSFULLY = "Record retrieved successfully";
+    private static final String RECORD_CREATED_SUCCESSFULLY = "Record created successfully";
+    private static final String RECORD_UPDATED_SUCCESSFULLY = "Record updated successfully";
+    private static final String RECORD_DELETED_SUCCESSFULLY = "Record deleted successfully";
 
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<HttpResponseDTO> saveEmployee(@RequestBody EmployeeDTO employeeDTO,
+        HttpServletRequest request) {
         try {
-            // Check if the input is null
             if (employeeDTO == null) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Employee cannot be null", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Employee body request cannot be null",
+                    null);
             }
 
-            // Save employee
-            employeeService.saveEmployee(employeeDTO);
+            Employee createdEmployee = employeeService
+                .saveEmployee(EmployeeMapper.toEntity(employeeDTO));
+            if (createdEmployee == null) {
+                return ResponseUtil.buildInternalServerErrorResponse(request, 
+                    INTERNAL_SERVER_ERROR,
+                    "Failed to create employee",
+                    null);
+            }
 
-            // Return the response
-            return ResponseEntity.created(null).body(new CustomHttpResponse(HttpStatus.CREATED.value(), 
-                "Employee saved successfully", null));
+            return ResponseUtil.buildCreatedResponse(request, 
+                RECORD_CREATED_SUCCESSFULLY,
+                EmployeeMapper.toDTO(createdEmployee));
+        } catch (EntityExistsException e) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                e.getMessage(),
+                null);
+        } catch (EntityNotFoundException e) {
+            return ResponseUtil.buildNotFoundResponse(request, 
+                RECORD_NOT_FOUND,
+                e.getMessage(),
+                null);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while saving the employee: " + e.getMessage(),
+                null);
         }
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllEmployees() {
+    public ResponseEntity<HttpResponseDTO> getAllEmployees(HttpServletRequest request) {
         try {
-            // Get all employees
-            List<EmployeeDTO> employees = employeeService.getAllEmployees();
-
-            // Check if the list is empty
+            List<Employee> employees = employeeService.getAllEmployees();
             if (employees == null || employees.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "No employees found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "No employees found",
+                    null);
             }
 
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "All employees fetched successfully", employees));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_RETRIEVED_SUCCESSFULLY,
+                EmployeeMapper.toDTOList(employees));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while fetching employees: " + e.getMessage(),
+                null);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<HttpResponseDTO> getEmployeeById(@PathVariable Long id,
+        HttpServletRequest request) {
         try {
-            // Check if the id is null
             if (id == null) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Employee id cannot be null", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Employee id cannot be null",
+                    null);
             } 
             
-            // Get employee by id
-            EmployeeDTO employee = employeeService.getEmployeeById(id);
-
-            // Check if the employee is null
+            Employee employee = employeeService.getEmployeeById(id);
             if (employee == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "Employee not found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "Employee not found with id: " + id,
+                    null);
             }
 
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "Employee fetched successfully", employee));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_RETRIEVED_SUCCESSFULLY,
+                EmployeeMapper.toDTO(employee));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while fetching the employee: " + e.getMessage(),
+                null);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<HttpResponseDTO> updateEmployee(@PathVariable Long id, 
+        @RequestBody EmployeeDTO employeeDTO, HttpServletRequest request) {
         try {
-            // Check if the id and employee are null
             if (id == null) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Employee id cannot be null", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Employee id cannot be null",
+                    null);
             }
 
             if (employeeDTO == null) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Employee cannot be null", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Employee body request cannot be null",
+                    null);
             }
 
-            // Update employee
-            EmployeeDTO updatedEmployee = employeeService.updateEmployee(id, employeeDTO);
-
-            // Check if the employee is null
+            Employee updatedEmployee = employeeService
+                .updateEmployee(id, EmployeeMapper.toEntity(employeeDTO));
             if (updatedEmployee == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "Employee not found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "Employee not found with id: " + id,
+                    null);
             }
             
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "Employee updated successfully", updatedEmployee));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_UPDATED_SUCCESSFULLY,
+                EmployeeMapper.toDTO(updatedEmployee));
+        } catch (EntityNotFoundException e) {
+            return ResponseUtil.buildNotFoundResponse(request, 
+                RECORD_NOT_FOUND,
+                e.getMessage(),
+                null);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while updating the employee: " + e.getMessage(),
+                null);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<HttpResponseDTO> deleteEmployee(@PathVariable Long id,
+        HttpServletRequest request) {
         try {
-            // Check if the id is null
             if (id == null) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Employee id cannot be null", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Employee id cannot be null",
+                    null);
             }
-
-            // Delete employee
+            
             if (!employeeService.deleteEmployee(id)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "Employee not found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "Employee not found with id: " + id,
+                    null);
             }
 
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "Employee deleted successfully", null));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_DELETED_SUCCESSFULLY,
+                null);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while deleting the employee: " + e.getMessage(),
+                null);
         }
     }
 }

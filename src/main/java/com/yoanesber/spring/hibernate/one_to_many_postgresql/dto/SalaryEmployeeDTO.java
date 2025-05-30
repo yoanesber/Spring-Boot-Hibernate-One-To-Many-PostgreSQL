@@ -1,14 +1,17 @@
 package com.yoanesber.spring.hibernate.one_to_many_postgresql.dto;
 
 import java.sql.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.SalaryEmployee;
+/**
+ * Data Transfer Object (DTO) for SalaryEmployee.
+ * This class is used to transfer data between layers, such as from the service layer to the controller layer.
+ * It contains only the necessary fields for transferring salary employee information.
+ */
 
 @Data
 @Getter
@@ -19,13 +22,4 @@ public class SalaryEmployeeDTO {
     private Date fromDate;
     private Long amount;
     private Date toDate;
-
-    public SalaryEmployeeDTO (SalaryEmployee salaryEmployee) {
-        if (salaryEmployee != null && salaryEmployee.getId() != null) {
-            this.fromDate = salaryEmployee.getId().getFromDate();
-        }
-
-        this.amount = salaryEmployee.getAmount();
-        this.toDate = salaryEmployee.getToDate();
-    }
 }

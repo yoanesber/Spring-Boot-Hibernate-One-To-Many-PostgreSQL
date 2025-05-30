@@ -1,7 +1,6 @@
 package com.yoanesber.spring.hibernate.one_to_many_postgresql.controller;
 
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,150 +10,194 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.dto.DepartmentDTO;
-import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.CustomHttpResponse;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.dto.HttpResponseDTO;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.Department;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.mapper.DepartmentMapper;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.DepartmentService;
+import com.yoanesber.spring.hibernate.one_to_many_postgresql.util.ResponseUtil;
+
+/**
+ * DepartmentController handles HTTP requests related to departments.
+ * It provides endpoints to create, retrieve, update, and delete departments.
+ */
 
 @RestController
 @RequestMapping("/api/v1/departments")
 public class DepartmentController {
-
     private final DepartmentService departmentService;
+
+    private static final String INVALID_REQUEST = "Invalid Request";
+    private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+    private static final String RECORD_NOT_FOUND = "Record not found";
+    private static final String RECORD_RETRIEVED_SUCCESSFULLY = "Record retrieved successfully";
+    private static final String RECORD_CREATED_SUCCESSFULLY = "Record created successfully";
+    private static final String RECORD_UPDATED_SUCCESSFULLY = "Record updated successfully";
+    private static final String RECORD_DELETED_SUCCESSFULLY = "Record deleted successfully";
 
     public DepartmentController(DepartmentService departmentService) {
         this.departmentService = departmentService;
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveDepartment(@RequestBody DepartmentDTO departmentDTO) {
+    public ResponseEntity<HttpResponseDTO> saveDepartment(@RequestBody DepartmentDTO departmentDTO,
+        HttpServletRequest request) {
         try {
-            // Check if the input is null
             if (departmentDTO == null) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Department cannot be null", null));
-            } 
-            
-            // Save department
-            departmentService.saveDepartment(departmentDTO);
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Department body request cannot be null",
+                    null);
+            }
 
-            // Return the response
-            return ResponseEntity.created(null).body(new CustomHttpResponse(HttpStatus.CREATED.value(), 
-                "Department saved successfully", null));
+            if (departmentDTO.getDeptName() == null || departmentDTO.getDeptName().isEmpty()) {
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Department name cannot be null or empty",
+                    null);
+            }
+            
+            Department createdDepartment = departmentService
+                .saveDepartment(DepartmentMapper.toEntity(departmentDTO));
+            if (createdDepartment == null) {
+                return ResponseUtil.buildInternalServerErrorResponse(request, 
+                    INTERNAL_SERVER_ERROR,
+                    "Failed to create department",
+                    null);
+            }
+
+            return ResponseUtil.buildCreatedResponse(request, 
+                RECORD_CREATED_SUCCESSFULLY,
+                DepartmentMapper.toDTO(createdDepartment));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while saving the department: " + e.getMessage(),
+                null);
         }
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllDepartments() {
+    public ResponseEntity<HttpResponseDTO> getAllDepartments(HttpServletRequest request) {
         try {
-            // Get all departments
-            List<DepartmentDTO> departments = departmentService.getAllDepartments();
-
-            // Check if the list is empty
+            List<Department> departments = departmentService.getAllDepartments();
             if (departments == null || departments.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "No departments found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "No departments found",
+                    null);
             }
             
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "All departments fetched successfully", departments));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_RETRIEVED_SUCCESSFULLY,
+                DepartmentMapper.toDTOList(departments));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while fetching departments: " + e.getMessage(),
+                null);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getDepartmentById(@PathVariable String id) {
+    public ResponseEntity<HttpResponseDTO> getDepartmentById(@PathVariable String id,
+        HttpServletRequest request) {
         try {
-            // Check if the input is null
             if (id == null || id.isEmpty()) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Department id cannot be null or empty", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Department id cannot be null or empty",
+                    null);
             }
 
-            // Get department by id
             id = id.toLowerCase();
             Department department = departmentService.getDepartmentById(id);
-
-            // Create department DTO
-            DepartmentDTO departmentDto = new DepartmentDTO(department);
-
-            // Check if department is null
             if (department == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "Department not found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "Department not found with id: " + id,
+                    null);
             }
 
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "Department fetched successfully", departmentDto));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_RETRIEVED_SUCCESSFULLY,
+                DepartmentMapper.toDTO(department));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while fetching the department: " + e.getMessage(),
+                null);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateDepartment(@PathVariable String id, @RequestBody DepartmentDTO departmentDTO) {
+    public ResponseEntity<HttpResponseDTO> updateDepartment(@PathVariable String id, 
+        @RequestBody DepartmentDTO departmentDTO, HttpServletRequest request) {
         try {
-            // Check if the input is null
             if (id == null || id.isEmpty()) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Department id cannot be null or empty", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Department id cannot be null or empty",
+                    null);
             }
 
             if (departmentDTO == null) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Department cannot be null", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Department body request cannot be null",
+                    null);
             }
             
-            // Update department
             id = id.toLowerCase();
-            DepartmentDTO updatedDepartment = departmentService.updateDepartment(id, departmentDTO);
-
-            // Check if department is null
+            Department updatedDepartment = departmentService
+                .updateDepartment(id, DepartmentMapper.toEntity(departmentDTO));
             if (updatedDepartment == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "Department not found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "Department not found with id: " + id,
+                    null);
             }
 
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "Department updated successfully", updatedDepartment));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_UPDATED_SUCCESSFULLY,
+                DepartmentMapper.toDTO(updatedDepartment));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while updating the department: " + e.getMessage(),
+                null);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteDepartment(@PathVariable String id) {
+    public ResponseEntity<HttpResponseDTO> deleteDepartment(@PathVariable String id,
+        HttpServletRequest request) {
         try {
-            // Check if the input is null
             if (id == null || id.isEmpty()) {
-                return ResponseEntity.badRequest().body(new CustomHttpResponse(HttpStatus.BAD_REQUEST.value(), 
-                    "Department id cannot be null or empty", null));
+                return ResponseUtil.buildBadRequestResponse(request, 
+                    INVALID_REQUEST,
+                    "Department id cannot be null or empty",
+                    null);
             }
 
-            // Delete department
             id = id.toLowerCase();
             if (!departmentService.deleteDepartment(id)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomHttpResponse(HttpStatus.NOT_FOUND.value(), 
-                    "Department not found", null));
+                return ResponseUtil.buildNotFoundResponse(request, 
+                    RECORD_NOT_FOUND, 
+                    "Department not found with id: " + id,
+                    null);
             }
 
-            // Return the response
-            return ResponseEntity.ok(new CustomHttpResponse(HttpStatus.OK.value(), 
-                "Department deleted successfully", null));
+            return ResponseUtil.buildOkResponse(request, 
+                RECORD_DELETED_SUCCESSFULLY,
+                null);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new CustomHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
-                e.getMessage(), null));
+            return ResponseUtil.buildInternalServerErrorResponse(request, 
+                INTERNAL_SERVER_ERROR,
+                "An error occurred while deleting the department: " + e.getMessage(),
+                null);
         }
     }
 }

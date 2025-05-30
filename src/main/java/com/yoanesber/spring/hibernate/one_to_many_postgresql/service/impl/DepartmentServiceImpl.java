@@ -1,20 +1,24 @@
 package com.yoanesber.spring.hibernate.one_to_many_postgresql.service.impl;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
-import com.yoanesber.spring.hibernate.one_to_many_postgresql.dto.DepartmentDTO;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.entity.Department;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.repository.DepartmentRepository;
 import com.yoanesber.spring.hibernate.one_to_many_postgresql.service.DepartmentService;
 
+/**
+ * Service implementation for managing Department entities.
+ * This class provides methods to save, retrieve, update, and delete departments.
+ * It handles the business logic and interacts with the DepartmentRepository for data access.
+ * The service ensures that departments are not duplicated and manages the active status of departments.
+ */
+
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
-    
     private final DepartmentRepository departmentRepository;
 
     public DepartmentServiceImpl(DepartmentRepository departmentRepository) {
@@ -23,104 +27,70 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public void saveDepartment(DepartmentDTO departmentDTO) {
-        Assert.notNull(departmentDTO, "Department cannot be null");
-
-        // Get existing department
-        Department existingDepartment = departmentRepository.findById(departmentDTO.getId())
+    public Department saveDepartment(Department department) {
+        Department existingDepartment = departmentRepository.findById(department.getId())
             .orElse(null);
 
-        // Check if department exists
+        // If the department already exists, update it instead of creating a new one
         if (existingDepartment != null) {
-            throw new IllegalArgumentException("Department with id " + departmentDTO.getId() + " already exists");
+            department.setUpdatedBy(department.getCreatedBy());
+            return updateDepartment(department.getId(), department);
         } 
-        
-        // Prepare department entity
-        Department department = new Department();
-        department.setId(departmentDTO.getId().toLowerCase());
-        department.setDeptName(departmentDTO.getDeptName());
-        department.setActive(null != departmentDTO.getActive() ? departmentDTO.getActive() : true);
-        department.setCreatedBy((Long)departmentDTO.getCreatedBy());
-        department.setCreatedDate(new Timestamp(System.currentTimeMillis()));
-        department.setUpdatedBy((Long)departmentDTO.getUpdatedBy());
-        department.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
 
-        // Save department
-        departmentRepository.save(department);
+        department.setCreatedAt(LocalDateTime.now());
+        return departmentRepository.save(department);
     }
 
     @Override
-    public List<DepartmentDTO> getAllDepartments() {
-        // Get all departments
-        List<Department> departments = departmentRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+    public List<Department> getAllDepartments() {
+        List<Department> departments = departmentRepository
+            .findAll(Sort.by(Sort.Direction.ASC, "id"));
 
-        // Check if departments is empty
         if (departments.isEmpty()) {
             return List.of();
         }
 
-        // Return departments
-        return departments.stream().map(DepartmentDTO::new).toList();
+        return departments;
     }
 
     @Override
     public Department getDepartmentById(String id) {
-        Assert.hasText(id, "Department id cannot be null or empty");
-
-        // Get department by id
-        Department department = departmentRepository.findById(id)
+        return departmentRepository.findById(id)
             .orElse(null);
-
-        // Check if department is null
-        if (department == null) {
-            throw new IllegalArgumentException("Department with id " + id + " does not exist");
-        }
-
-        // Return department
-        return department;
     }
 
     @Override
     @Transactional
-    public DepartmentDTO updateDepartment(String id, DepartmentDTO departmentDTO) {
-        Assert.notNull(departmentDTO, "Department cannot be null");
-        Assert.hasText(id, "Department id cannot be null or empty");
-
-        // Get existing department
+    public Department updateDepartment(String id, Department department) {
         Department existingDepartment = departmentRepository.findById(id)
             .orElse(null);
 
-        // Check if department exists
         if (existingDepartment == null) {
-            throw new IllegalArgumentException("Department with id " + id + " does not exist");
+            return null;
         } 
-        
-        // Update department
-        existingDepartment.setDeptName(departmentDTO.getDeptName());
-        existingDepartment.setActive(null != departmentDTO.getActive() ? departmentDTO.getActive() : existingDepartment.getActive());
-        existingDepartment.setUpdatedBy((Long)departmentDTO.getUpdatedBy());
-        existingDepartment.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
 
-        // Save department
-        return new DepartmentDTO(departmentRepository.save(existingDepartment));
+        existingDepartment.setDeptName(department.getDeptName());
+        existingDepartment.setActive(null != department.getActive() ? 
+            department.getActive() : existingDepartment.getActive());
+        existingDepartment.setUpdatedBy(department.getUpdatedBy());
+        existingDepartment.setUpdatedAt(LocalDateTime.now());
+        return departmentRepository.save(existingDepartment);
     }
 
     @Override
     @Transactional
     public Boolean deleteDepartment(String id) {
-        Assert.hasText(id, "Department id cannot be null or empty");
-
-        // Get existing department
         Department existingDepartment = departmentRepository.findById(id)
             .orElse(null);
 
-        // Check if department exists
         if (existingDepartment == null) {
-            throw new IllegalArgumentException("Department with id " + id + " does not exist");
+            return false;
         }
 
-        // Delete department
-        departmentRepository.deleteById(id);
+        existingDepartment.setActive(false);
+        existingDepartment.setDeleted(true);
+        existingDepartment.setDeletedAt(LocalDateTime.now());
+        departmentRepository.save(existingDepartment);
         
         return true;
     }
