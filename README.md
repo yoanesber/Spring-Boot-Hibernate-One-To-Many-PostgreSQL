@@ -247,7 +247,7 @@ spring.datasource.password=app@123
 ```
 
 
-## 🚀 8. Running the Application  
+## 🚀 7. Running the Application  
 
 This section provides step-by-step instructions to run the application either **locally** or via **Docker containers**.
 
