@@ -44,21 +44,21 @@ public class DepartmentController {
     @PostMapping
     public ResponseEntity<HttpResponseDTO> saveDepartment(@RequestBody DepartmentDTO departmentDTO,
         HttpServletRequest request) {
-        try {
-            if (departmentDTO == null) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Department body request cannot be null",
-                    null);
-            }
+        if (departmentDTO == null) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Department body request cannot be null",
+                null);
+        }
 
-            if (departmentDTO.getDeptName() == null || departmentDTO.getDeptName().isEmpty()) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Department name cannot be null or empty",
-                    null);
-            }
-            
+        if (departmentDTO.getDeptName() == null || departmentDTO.getDeptName().isEmpty()) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Department name cannot be null or empty",
+                null);
+        }
+        
+        try {
             Department createdDepartment = departmentService
                 .saveDepartment(DepartmentMapper.toEntity(departmentDTO));
             if (createdDepartment == null) {
@@ -104,14 +104,14 @@ public class DepartmentController {
     @GetMapping("/{id}")
     public ResponseEntity<HttpResponseDTO> getDepartmentById(@PathVariable String id,
         HttpServletRequest request) {
-        try {
-            if (id == null || id.isEmpty()) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Department id cannot be null or empty",
-                    null);
-            }
+        if (id == null || id.isEmpty()) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Department id cannot be null or empty",
+                null);
+        }
 
+        try {
             id = id.toLowerCase();
             Department department = departmentService.getDepartmentById(id);
             if (department == null) {
@@ -135,21 +135,21 @@ public class DepartmentController {
     @PutMapping("/{id}")
     public ResponseEntity<HttpResponseDTO> updateDepartment(@PathVariable String id, 
         @RequestBody DepartmentDTO departmentDTO, HttpServletRequest request) {
-        try {
-            if (id == null || id.isEmpty()) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Department id cannot be null or empty",
-                    null);
-            }
+        if (id == null || id.isEmpty()) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Department id cannot be null or empty",
+                null);
+        }
 
-            if (departmentDTO == null) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Department body request cannot be null",
-                    null);
-            }
-            
+        if (departmentDTO == null) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Department body request cannot be null",
+                null);
+        }
+        
+        try {
             id = id.toLowerCase();
             Department updatedDepartment = departmentService
                 .updateDepartment(id, DepartmentMapper.toEntity(departmentDTO));
@@ -174,14 +174,14 @@ public class DepartmentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpResponseDTO> deleteDepartment(@PathVariable String id,
         HttpServletRequest request) {
-        try {
-            if (id == null || id.isEmpty()) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Department id cannot be null or empty",
-                    null);
-            }
+        if (id == null || id.isEmpty()) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Department id cannot be null or empty",
+                null);
+        }
 
+        try {
             id = id.toLowerCase();
             if (!departmentService.deleteDepartment(id)) {
                 return ResponseUtil.buildNotFoundResponse(request, 

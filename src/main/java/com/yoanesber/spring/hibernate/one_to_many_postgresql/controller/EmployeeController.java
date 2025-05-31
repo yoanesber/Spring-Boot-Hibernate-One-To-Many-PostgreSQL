@@ -46,14 +46,14 @@ public class EmployeeController {
     @PostMapping
     public ResponseEntity<HttpResponseDTO> saveEmployee(@RequestBody EmployeeDTO employeeDTO,
         HttpServletRequest request) {
-        try {
-            if (employeeDTO == null) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Employee body request cannot be null",
-                    null);
-            }
+        if (employeeDTO == null) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Employee body request cannot be null",
+                null);
+        }
 
+        try {
             Employee createdEmployee = employeeService
                 .saveEmployee(EmployeeMapper.toEntity(employeeDTO));
             if (createdEmployee == null) {
@@ -109,14 +109,14 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public ResponseEntity<HttpResponseDTO> getEmployeeById(@PathVariable Long id,
         HttpServletRequest request) {
+         if (id == null) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Employee id cannot be null",
+                null);
+        } 
+        
         try {
-            if (id == null) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Employee id cannot be null",
-                    null);
-            } 
-            
             Employee employee = employeeService.getEmployeeById(id);
             if (employee == null) {
                 return ResponseUtil.buildNotFoundResponse(request, 
@@ -139,21 +139,21 @@ public class EmployeeController {
     @PutMapping("/{id}")
     public ResponseEntity<HttpResponseDTO> updateEmployee(@PathVariable Long id, 
         @RequestBody EmployeeDTO employeeDTO, HttpServletRequest request) {
+        if (id == null) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Employee id cannot be null",
+                null);
+        }
+
+        if (employeeDTO == null) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Employee body request cannot be null",
+                null);
+        }
+
         try {
-            if (id == null) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Employee id cannot be null",
-                    null);
-            }
-
-            if (employeeDTO == null) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Employee body request cannot be null",
-                    null);
-            }
-
             Employee updatedEmployee = employeeService
                 .updateEmployee(id, EmployeeMapper.toEntity(employeeDTO));
             if (updatedEmployee == null) {
@@ -182,14 +182,14 @@ public class EmployeeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpResponseDTO> deleteEmployee(@PathVariable Long id,
         HttpServletRequest request) {
+        if (id == null) {
+            return ResponseUtil.buildBadRequestResponse(request, 
+                INVALID_REQUEST,
+                "Employee id cannot be null",
+                null);
+        }
+        
         try {
-            if (id == null) {
-                return ResponseUtil.buildBadRequestResponse(request, 
-                    INVALID_REQUEST,
-                    "Employee id cannot be null",
-                    null);
-            }
-            
             if (!employeeService.deleteEmployee(id)) {
                 return ResponseUtil.buildNotFoundResponse(request, 
                     RECORD_NOT_FOUND, 
